@@ -8,7 +8,7 @@ Clone our source code
 ```sh
 $ git clone https://github.com/nh0znoisung/AI_intro_Assignment_1.git
 $ cd AI_intro_Assignment_1
-``
+```
 
 Install Dependencies
 
