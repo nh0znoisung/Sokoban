@@ -214,14 +214,14 @@ class Board:
 
 
 	def undo(self, direction):
-		if len(history_moves) > 0:
-			move = history_moves[-1]
+		if len(self.history_moves) > 0:
+			move = self.history_moves[-1]
 			if move.pushed == 1:
 				self.boxes.remove(self.player + direction)
 				self.boxes.add(self.player)
 
 			self.player = self.player - direction
-			history_moves.pop()
+			self.history_moves.pop()
 		self.set_available_moves()
 
 	# def dfs(): => In same class or more function ?? 
@@ -281,7 +281,7 @@ class Board:
 # state = set(), used for check duplicate with O(logn)
 
 board = Board()
-board.set_value("test_2.txt")
+board.set_value("./test/Micro Cosmos/15.txt")
 
 # how to center it
 
