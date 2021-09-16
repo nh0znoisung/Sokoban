@@ -1,66 +1,3 @@
-import pygame
-import os
-import psutil
-
-successes, failures = pygame.init()
-print("{0} successes and {1} failures".format(successes, failures))
-
-# SOKOBAN solver
-
-# screen = pygame.display.set_mode((600, 600))
-clock = pygame.time.Clock()
-FPS = 60  # Frames per second.
-
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-GRAY_LIGHT = (231,231,231)
-# RED = (255, 0, 0), GREEN = (0, 255, 0), BLUE = (0, 0, 255).
-
-
-
-
-pygame.display.set_caption("Sokoban Solver")
-surface = pygame.display.set_mode((600,600))
-
-board = []
-
-# How to calculate the time and space complexity
-# Find max of length width and height: Hope 12x12
-# width and height of box (50x50), default: (16x16)
-
-numsRow = 8 #maybe change
-numsCol = 8
-
-numsUnit = max(numsCol, numsRow)
-
-lengthSquare = int(600/numsUnit)
-
-# offset
-
-background = pygame.image.load("Items/background.jpg")
-background = pygame.transform.scale(background, (600, 600))
-
-wall = pygame.image.load('Items/wall.png')
-wall = pygame.transform.scale(wall, (lengthSquare, lengthSquare))
-
-box = pygame.image.load('Items/box.png')
-box = pygame.transform.scale(box, (lengthSquare, lengthSquare))
-
-goal = pygame.image.load('Items/goal.png')
-goal = pygame.transform.scale(goal, (lengthSquare, lengthSquare))
-
-player = pygame.image.load('Items/player.png')
-player = pygame.transform.scale(player, (lengthSquare, lengthSquare))
-
-def display_background():
-	surface.blit(background, [0, 0])
-
-# We want to dogde many if else as much as possible because it will cause more errors when coding.
-# -> So we can assume that L,R,U,D as a Point (+-1, 0), (0, +-1)
-
-# We can use a tuple with 2 variable (x,y) as coordinate of graph but it still need some way to interact with other points
-
-# We create a Data Structure of each point, bacause we need some interaction between point to point such as add 2 point for moving left current point + (0,-1), double point for checking avaiable move, equation for set checking duplicate
 
 class Point:
 	def __init__(self):
@@ -263,86 +200,18 @@ class Board:
 
 		self.set_available_moves()
 
-# We need a DS can have more Direction
-# Point = (x,y), simple add, print, double, __eq__
-#  Direction = ((x,y), 'char') 
-
-# Move_available = directions = [U,D,L,R]
-
-# add filename
-#do not convert it into number, just character to set
-
-# We have 2 options: use matrix for saving, hash table with Time: O(1), Space: O(n*m), => Hard to control overlap position: player vs goal and box vs goal
-# or using Set for hash Time: O(logn), Space(m*n)
-
-# Fixed: background + wall + path + goal 
-# Variable: player + box + (goal + box) => Use flag
-
-# state = set(), used for check duplicate with O(logn)
-
 board = Board()
-board.set_value("./test_1.txt")
+board.set_value("test_1.txt")
 
-# how to center it
-
-def draw_board(board):
-
-	display_background()
-	
-
-	for point in board.walls:
-		surface.blit(wall, [lengthSquare * point.x, lengthSquare * point.y])
-	
-	for point in board.paths:
-		pygame.draw.rect(surface, WHITE, [lengthSquare * point.x, lengthSquare * point.y, lengthSquare, lengthSquare])
-
-	
-
-	for point in board.goals:
-		surface.blit(goal, [lengthSquare * point.x, lengthSquare * point.y])
-
-	point = board.player
-	surface.blit(player, [lengthSquare * point.x, lengthSquare * point.y])
-
-	for point in board.boxes:
-		surface.blit(box, [lengthSquare * point.x, lengthSquare * point.y])
-
-	# print()
-	# i = 1
-	# j = 1
-	# pygame.draw.rect(surface, GRAY_LIGHT, [lengthSquare * i, lengthSquare * j, lengthSquare, lengthSquare])
-
-				
-	# i = 0
-	# j = 2
-	
-	
-	pygame.display.flip()
+# implementation of BFS
+# is_win(): Check goal state
+# move(L,R,U,D): Choices for moving
+# board.available_moves: Create a list of available_moves
+# OUTPUT:-> print() to a file named result.txt
+def bfs(board):
+    return ""
 
 
-def main():
-	global board
-	while True:
-		clock.tick(FPS)
 
-		for event in pygame.event.get():
-			keys_pressed = pygame.key.get_pressed()
-			if event.type == pygame.QUIT or keys_pressed[pygame.K_q]:
-				pygame.quit()
-			elif event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_w or event.key == pygame.K_UP:
-					board.move(U)
-				elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
-					print("adfasd")
-					board.move(D)
-				elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
-					board.move(L)
-				elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-					board.move(R)
 
-		draw_board(board)
-
-		pygame.display.update()
-
-if __name__ == '__main__':
-	main()
+bfs(board)
