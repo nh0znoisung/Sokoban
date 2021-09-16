@@ -1,4 +1,8 @@
 
+
+from queue import Queue
+from copy import deepcopy
+from time import time
 class Point:
 	def __init__(self):
 		self.x = -1
@@ -203,15 +207,49 @@ class Board:
 board = Board()
 board.set_value("test_1.txt")
 
+def print_results(board, gen, rep, fre, expl, dur):
+	print("\n1. Breadth first search")
+	print("Solution: "	)
+	print("Nodes generated: " + str(gen))
+	print("Nodes repeated: " + str(rep))
+	print("Explored nodes: " + str(expl))
+	print('Duration: ' + str(dur) + 'secs')
+
 # implementation of BFS
 # is_win(): Check goal state
 # move(L,R,U,D): Choices for moving
 # board.available_moves: Create a list of available_moves
 # OUTPUT:-> print() to a file named result.txt
 def bfs(board):
-    return ""
+	start = time()
+	nodes_generated = 0
+	nodes_repeated = 0
+	nodes_freeze = 0
 
+	if (board.is_win()):
+		end = time()
+		print_results(board,1,nodes_repeated,0,end-start)
+		return 
+	frontier = Queue()
+	explored = set()
+	frontier.put(board)
+	stayed_Searching = True
 
-
+	while stayed_Searching:
+		if frontier.empty():
+			print("Solution not found\n")
+			return
+		node = frontier.get()
+		explored.add(node)
+		for m in node.available_moves:
+			node.move(m)
+			child = deepcopy(node)
+			if child not in explored:
+				if (child.is_win()):
+					end = time()
+					print_results(child,0,0,0,0,end-start)	
+					return 
+				frontier.put(child)
+				
 
 bfs(board)
