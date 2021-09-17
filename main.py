@@ -423,6 +423,11 @@ class Board:
 	def __eq__(self, other):
 		return self.walls == other.walls and self.goals == other.goals and self.boxes == other.boxes and self.player == other.player
 
+	def __key(self):
+		return (self.walls, self.goals, self.boxes, self.player)
+
+	def __hash__(self):
+		return hash(self.__key())
 
 	def add_wall(self, x, y):
 		self.walls.add(Point(x,y))
