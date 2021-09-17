@@ -392,6 +392,7 @@ class Board:
 	# Set for finding and adding operator with time complexity O(logn), with already function such as union(), issubset(),..
 	def __init__(self):
 		# self.dir_list = dir_list  # list of directions for solution
+		self.name = ''
 		self.history_moves = [] # List of tuple (Direction, Boolean), Bool for saving we pushed the boxes or not
 		self.available_moves = []
 		self.walls = set() # Consider set or 2d-array for time and space-complexity and since the fixed property
@@ -409,6 +410,7 @@ class Board:
 		# set_available_moves()
 
 	def clear_value(self):
+		self.name = ''
 		self.history_moves = [] # List of tuple (Direction, Boolean), Bool for saving we pushed the boxes or not
 		self.available_moves = []
 		self.walls = set() # Consider set or 2d-array for time and space-complexity and since the fixed property
@@ -428,7 +430,7 @@ class Board:
 		return self.walls == other.walls and self.goals == other.goals and self.boxes == other.boxes and self.player == other.player
 
 	def __key(self):
-		return (self.walls, self.goals, self.boxes, self.player)
+		return (self.name)
 
 	def __hash__(self):
 		return hash(self.__key())
@@ -534,6 +536,7 @@ class Board:
 
 	def set_value(self, filename):
 		self.clear_value()
+		self.name = filename
 		x = 0
 		y = 0
 		with open(filename, 'r') as f:
