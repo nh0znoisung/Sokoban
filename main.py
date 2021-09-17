@@ -1,4 +1,6 @@
 import pygame
+import time
+from pygame.locals import *
 import os
 import psutil
 
@@ -11,34 +13,51 @@ print("{0} successes and {1} failures".format(successes, failures))
 clock = pygame.time.Clock()
 FPS = 60  # Frames per second.
 
+WIDTH = 700
+HEIGHT = 1100
+
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GRAY_LIGHT = (231,231,231)
-# RED = (255, 0, 0), GREEN = (0, 255, 0), BLUE = (0, 0, 255).
+ORANGE = '#ff631c'
+BLUE_LIGHT = (40, 53, 88) # menu
+RED = (255,0,0) # end
+BLUE = (0, 0, 255) #line
+YELLOW = (255, 255, 0) # title
+YELLOW_LIGHT = (255,255,51)
+BROWN = (210,105,30)
+PINK = (204, 0, 255) # start
+GREEN_LIGHT = (0, 255, 140) # node
+GREEN = (0, 255, 0)
+GREEN_DARK = (0, 255, 0)
+# RED = (255, 0, 0), , BLUE = (0, 0, 255).
 
-
+menuFont = pygame.font.SysFont("CopperPlate Gothic", 60, bold = True)  
+helpFont = pygame.font.SysFont("Comic Sans MS", 25)      
+wordFont = pygame.font.SysFont("CopperPlate Gothic",25)  
+mapFont = pygame.font.SysFont("Comic Sans MS", 20, bold = True)   
+levelFont = pygame.font.SysFont("Comic Sans MS", 25, bold = True)  
+buttonFont = pygame.font.SysFont("CopperPlate Gothic", 18, bold = True)
+# statusFont = pygame.font.SysFont("CopperPlate Gothic",25)    
 
 
 pygame.display.set_caption("Sokoban Solver")
-surface = pygame.display.set_mode((600,600))
-
-board = []
-
-# How to calculate the time and space complexity
-# Find max of length width and height: Hope 12x12
-# width and height of box (50x50), default: (16x16)
+surface = pygame.display.set_mode((HEIGHT,WIDTH))
 
 numsRow = 8 #maybe change
-numsCol = 8
+numsCol = 8 
 
 numsUnit = max(numsCol, numsRow)
+lengthSquare = int(WIDTH/numsUnit)
 
-lengthSquare = int(600/numsUnit)
+offsetX = lengthSquare * (numsUnit - numsCol)/2 
+offsetY = lengthSquare * (numsUnit - numsRow)/2 
+
 
 # offset
 
 background = pygame.image.load("Items/background.jpg")
-background = pygame.transform.scale(background, (600, 600))
+background = pygame.transform.scale(background, (WIDTH, WIDTH))
 
 wall = pygame.image.load('Items/wall.png')
 wall = pygame.transform.scale(wall, (lengthSquare, lengthSquare))
@@ -52,9 +71,250 @@ goal = pygame.transform.scale(goal, (lengthSquare, lengthSquare))
 player = pygame.image.load('Items/player.png')
 player = pygame.transform.scale(player, (lengthSquare, lengthSquare))
 
+up_arrow = pygame.image.load("Items/up_arrow.png")
+up_arrow = pygame.transform.scale(up_arrow, (20, 20))
+
+down_arrow = pygame.image.load("Items/down_arrow.png")
+down_arrow = pygame.transform.scale(down_arrow, (20, 20))
+
+pick_button = pygame.image.load("Items/choose.png")
+pick_button = pygame.transform.scale(pick_button, (98, 41))
+
+change = pygame.image.load("Items/change.png")
+change = pygame.transform.scale(change, (32, 32))
+
+visualize_button = pygame.image.load("Items/visualizebutton.png")
+# visualize_button = pygame.transform.scale(visualize_button, (98, 41))
+
+restart_button = pygame.image.load("Items/restart.png")
+restart_button = pygame.transform.scale(restart_button, (105, 40))
+
+undo_button = pygame.image.load("Items/undo.png")
+undo_button = pygame.transform.scale(undo_button, (35, 35))
+
+redo_button = pygame.image.load("Items/redo.png")
+redo_button = pygame.transform.scale(redo_button, (35, 35))
+
+
+
+up_arrow_rect = Rect(600 + 245, 0 + 200, 20, 20)
+down_arrow_rect = Rect(600 + 245, 0 + 220, 20, 20)
+change_rect = Rect(600 + 367, 0 + 155, 32, 32)
+pick_rect = Rect(600 + 400, 0 + 178, 98, 41)
+self_rect = Rect(700 + 40, 305, 110, 48)
+bfs_rect = Rect(700 + 165, 305, 95, 48)
+A_rect = Rect(700 + 275, 305, 95, 48)
+restart_rect = Rect(700 + 160, 0 + 410, 105, 40)
+visualize_rect = Rect(700 + 135, 0 + 650, 161, 34)
+undo_rect = Rect(700 + 90, 0 + 410, 50, 40)
+redo_rect = Rect(700 + 285, 0 + 410, 50, 40)
+
+def display_title():
+    menuText = menuFont.render("SOKOBAN", True, ORANGE)
+    surface.blit(menuText, [700 + 35, 0 + 20])
+
 def display_background():
 	surface.blit(background, [0, 0])
 
+def display_title_step_1(color = RED):
+	step1Text = helpFont.render("1. Choose your round", True, color)
+	surface.blit(step1Text, [700 + 10, 0 + 105])
+
+def display_up_arrow():
+	surface.blit(up_arrow, [600 + 245, 0 + 200])
+
+def display_down_arrow():
+	surface.blit(down_arrow, [600 + 245, 0 + 220])
+
+def display_change():
+	surface.blit(change, [600 + 367, 0 + 155])
+
+def display_pick_button():
+	surface.blit(pick_button, [600 + 400, 0 + 178])
+
+def display_title_content_1(color = BROWN):
+	statusText = helpFont.render("Map:", True, color)
+	attemptedText = helpFont.render("Level:", True, color)
+	surface.blit(statusText, [700 + 30, 0 + 152])
+	surface.blit(attemptedText, [700 + 30, 0 + 200])
+
+def display_map(color = GRAY_LIGHT):
+	mapText = mapFont.render(f"{map_list[map_index]}", True, color)
+	surface.blit(mapText, [700 + 95, 0 + 155])
+
+def check_one_digit(n):
+	if len(str(n)) == 1:
+		return True
+	return False
+
+def display_level(color = GRAY_LIGHT):
+	# Check if 2 digits
+	levelText = levelFont.render(f"{level + 1}", True, color)
+	if check_one_digit(level):
+		surface.blit(levelText, [700 + 115, 0 + 200])
+	else:
+		surface.blit(levelText, [700 + 105, 0 + 200])
+
+
+def display_help():
+	helpText = levelFont.render("(1-40)", True, BROWN)
+	surface.blit(helpText, [700 + 185, 0 + 200])
+
+
+
+
+
+def display_title_step_2(color = RED):
+	step2Text = helpFont.render("2. Choose your gameplay", True, color)
+	surface.blit(step2Text, [700 + 10, 0 + 252])
+
+
+def display_button_self():
+	pygame.draw.rect(surface, BLACK, pygame.Rect(700 + 40, 305, 110, 48),  0, 6)
+	step7Text = buttonFont.render("Manually", True, GREEN)
+	surface.blit(step7Text, [700 + 45, 318])
+
+def display_button_BFS():
+	pygame.draw.rect(surface, BLACK, pygame.Rect(700 + 165, 305, 95, 48),  0, 6)
+	step7Text = buttonFont.render("BFS", True, PINK)
+	surface.blit(step7Text, [700 + 190, 318])
+
+def display_button_A():
+	pygame.draw.rect(surface, BLACK, pygame.Rect(700 + 275, 305, 95, 48),  0, 6)
+	step7Text = buttonFont.render("A*", True, YELLOW_LIGHT)
+	surface.blit(step7Text, [700 + 313, 318])
+
+
+
+
+def display_title_step_3(color = RED):
+	step3Text = helpFont.render("3. Happy Hacking!!!", True, color)
+	surface.blit(step3Text, [700 + 10, 0 + 365])
+
+def display_title_content_step_3(color = BROWN):
+	statusText = helpFont.render("Status:", True, color)
+	attemptedText = helpFont.render("Time:", True, color)
+	stepText = helpFont.render("Step:", True, color)
+	pushedText = helpFont.render("Pushed:", True, color)
+	surface.blit(statusText, [700 + 26, 0 + 455])
+	surface.blit(attemptedText, [700 + 30, 0 + 503])
+	surface.blit(stepText, [700 + 30, 0 + 550])
+	surface.blit(pushedText, [700 + 30, 0 + 600])
+
+
+def display_content_step_3():
+	status_str = ""
+	if win == -1:
+		status_str = ""
+		status_col = YELLOW
+	if win == 0:
+		status_str = "Solving . . ."
+		status_col = (255,255,51)
+	elif win == 2:
+		status_str = "No solution"
+		status_col = RED
+	elif win == 1:
+		status_str = "Win !!@@!!"
+		status_col = GREEN_DARK
+
+	statusText = wordFont.render(f"{status_str}", True, status_col)
+	timeText = helpFont.render("{:0.3f} s".format(timeTook), True, GREEN_LIGHT)
+	stepText = helpFont.render(f"{stepNode}", True, GREEN_LIGHT)
+	pushedText = helpFont.render(f"{pushed}", True, GREEN_LIGHT)
+
+	surface.blit(statusText, [700 + 127, 0 + 458])
+	surface.blit(timeText, [700 + 110, 0 + 503])
+	surface.blit(stepText, [700 + 135, 0 + 550])
+	surface.blit(pushedText, [700 + 135, 0 + 600])
+
+
+def display_restart():
+	surface.blit(restart_button, [700 + 160, 0 + 410])
+
+def display_visualize():
+	print("asdf")
+	surface.blit(visualize_button, [700 + 135, 0 + 650])
+
+def display_undo():
+	pygame.draw.rect(surface, RED, pygame.Rect(700 + 90, 0 + 410, 50, 40),  0, 20)
+	surface.blit(undo_button, [700 + 95, 0 + 410])
+
+def display_redo():
+	pygame.draw.rect(surface, RED, pygame.Rect(700 + 285, 0 + 410, 50, 40),  0, 20)
+	surface.blit(redo_button, [700 + 292, 0 + 410])
+
+def display_step_1(col = RED, mode = -1):
+	display_title_step_1(color = col)
+	if mode == -1:
+		display_up_arrow()
+		display_down_arrow()
+		display_change()
+		display_pick_button()
+		display_title_content_1()
+		display_map()
+		display_level()
+		display_help()
+	else:
+		display_title_content_1()
+		display_map(RED)
+		display_level(RED)
+
+def display_step_2(col = RED, mode = 0):
+	display_title_step_2(color = col)
+	if mode == 0:
+		display_button_self()
+		display_button_BFS()
+		display_button_A()
+	elif mode == 1:
+		display_button_self()
+	elif mode == 2:
+		display_button_BFS()
+	elif mode == 3:
+		display_button_A()
+
+
+def display_step_3(col = RED, mode = 0):
+	display_title_step_3(color = col)
+	# display_visualize()
+	# print(mode)
+	if mode == 2 or mode == 3:
+		display_visualize()		
+		display_undo()
+		display_redo()
+		display_restart()
+		display_title_content_step_3()
+		display_content_step_3()
+	if mode == 1:
+		display_undo()
+		display_redo()
+		display_restart()
+		display_title_content_step_3()
+		display_content_step_3()
+
+	
+# status = 0, time = 0, step = 0, pushed = 0
+def draw_menu():
+	pygame.draw.rect(surface, BLUE_LIGHT, [700, 0, 1050, 700])
+
+	display_background()
+	if step == 1:
+		display_step_1(YELLOW, -1)
+		display_step_2(mode = -1)
+		display_step_3()
+	elif step == 2:
+		display_step_1(GREEN_DARK, 0)
+		display_step_2(YELLOW, mode = 0)
+		display_step_3()
+	elif step == 3:
+		if win == 0:
+			display_step_1(GREEN_DARK, 0)
+			# print(mode)
+			display_step_2(GREEN_DARK, mode = mode)
+			display_step_3(YELLOW, mode = mode)
+		else:
+			display_step_1(GREEN_DARK, 0)
+			display_step_2(GREEN_DARK, mode = mode)
+			display_step_3(GREEN_DARK, mode = mode)
 # We want to dogde many if else as much as possible because it will cause more errors when coding.
 # -> So we can assume that L,R,U,D as a Point (+-1, 0), (0, +-1)
 
@@ -139,16 +399,26 @@ class Board:
 		self.boxes = set()
 		self.paths = set()
 		self.player = None
+		self.step = 0
+		self.pushed = 0
+		self.ptr = -1
+		self.x = -1
+		self.y = -1
+		self.ptr = 0
 		self.cost = 1e9  # used for heuristic search: A* algorithm
 		# set_available_moves()
 
 	def clear_value(self):
+		self.history_moves = []
+		self.available_moves = []
 		self.walls.clear()
 		self.goals.clear()
 		self.boxes.clear()
 		self.paths.clear()
 		self.player = None
 		self.cost = 1e9
+		self.x = -1
+		self.y = -1
 
 	def add_wall(self, x, y):
 		self.walls.add(Point(x,y))
@@ -200,9 +470,15 @@ class Board:
 
 		# move the player with direction but the argument make sure direction in the available_moves() 
 		if direction in self.available_moves:
+			self.ptr += 1
+			if self.ptr < len(self.history_moves):
+				# Cut the list
+				self.history_moves = self.history_moves[0:self.ptr]
 			temp = self.player + direction.vector
+			self.step += 1
 			if temp in self.boxes:
 				# We push the box forward, so we need to remove the current position and add the forward position
+				self.pushed += 1
 				self.boxes.remove(temp)
 				self.boxes.add(temp + direction.vector)
 				self.history_moves.append(Move(direction, 1))
@@ -213,21 +489,29 @@ class Board:
 		self.set_available_moves()
 
 
-	def undo(self, direction):
-		if len(self.history_moves) > 0:
-			move = self.history_moves[-1]
+	def undo(self):
+		if self.ptr > 0:
+			self.ptr -= 1
+			move = self.history_moves[self.ptr]
 			if move.pushed == 1:
-				self.boxes.remove(self.player + direction)
+				self.pushed -= 1
+				self.boxes.remove(self.player + move.direction.vector)
 				self.boxes.add(self.player)
 
-			self.player = self.player - direction
-			self.history_moves.pop()
+			self.player = self.player - move.direction.vector
+			self.step -= 1
+			# self.history_moves.pop()
 		self.set_available_moves()
+
+
+	def redo(self):
+		if self.ptr < len(self.history_moves):
+			self.move(self.history_moves[self.ptr])
+			self.ptr += 1
 
 	# def dfs(): => In same class or more function ?? 
 	# def a_star():
 
-	
 
 	def is_win(self):
 		if self.goals.issubset(self.boxes):
@@ -236,12 +520,14 @@ class Board:
 			return False
 
 	def set_value(self, filename):
+		self.clear_value()
+		x = 0
+		y = 0
 		with open(filename, 'r') as f:
 			read_data = f.read()
-			lines = read_data.split('\n')
-			x = 0
-			y = 0
+			lines = read_data.split('\n')	
 			for line in lines:
+				x = 0
 				for char in line:
 					if char == '#': # Wall
 						self.add_wall(x,y)
@@ -254,14 +540,58 @@ class Board:
 					elif char == '@': # Player
 						self.add_player(x,y)
 						self.add_path(x,y)
+					elif char == '-':
+						self.add_goal(x,y)
+						self.add_player(x,y)
+						self.add_path(x,y)
+					elif char == '+':
+						self.add_goal(x,y)
+						self.add_box(x,y)
+						self.add_path(x,y)
 					elif char == '.': # Path - avaiable move
 						self.add_path(x,y)
 				
 					x += 1
-				x = 0
 				y += 1
-
 		self.set_available_moves()
+		return (x,y)
+
+
+# filename = ""
+board = Board()
+# board.set_value(filename)
+
+# Goal + player = (-)
+# Goal + box = (+)
+# win = True
+
+
+
+
+def reset_data():
+	global board, numsCol, numsRow, numsUnit, lengthSquare, offsetX, offsetY, wall, box, goal, player
+	
+	wall = pygame.image.load('Items/wall.png')
+
+	box = pygame.image.load('Items/box.png')
+
+	goal = pygame.image.load('Items/goal.png')
+
+	player = pygame.image.load('Items/player.png')
+	numsRow, numsCol = board.set_value("./Testcases/{}/{}.txt".format(map_list[map_index], level+1))
+
+	numsUnit = max(numsCol, numsRow)
+	lengthSquare = int(WIDTH/numsUnit)
+
+	print(numsCol, numsRow, numsUnit)
+
+	offsetX = lengthSquare * (numsUnit - numsRow)/2 
+	offsetY = lengthSquare * (numsUnit - numsCol)/2 
+
+	wall = pygame.transform.scale(wall, (lengthSquare, lengthSquare))
+	box = pygame.transform.scale(box, (lengthSquare, lengthSquare))
+	goal = pygame.transform.scale(goal, (lengthSquare, lengthSquare))
+	player = pygame.transform.scale(player, (lengthSquare, lengthSquare))
 
 # We need a DS can have more Direction
 # Point = (x,y), simple add, print, double, __eq__
@@ -280,32 +610,54 @@ class Board:
 
 # state = set(), used for check duplicate with O(logn)
 
-board = Board()
-board.set_value("./test_1.txt")
+
+
+# How to calculate the time and space complexity
+# Find max of length width and height: Hope 12x12
+# width and height of box (50x50), default: (16x16)
+
+
+# 
 
 # how to center it
+map_list = ['MINI COSMOS', 'MICRO COSMOS']
+map_index = 0
+level = 0 # (level + 1)%40 + 1
+
+reset_data()
+# reset_data("./Testcases/Mini Cosmos/6.txt")
+
+
+
+
+
 
 def draw_board(board):
-
-	display_background()
-	
+	# print("asd")
+	draw_menu()
+	# print("adsf")
+	# offsetX = 0
+	# offsetY = 0
 
 	for point in board.walls:
-		surface.blit(wall, [lengthSquare * point.x, lengthSquare * point.y])
+		surface.blit(wall, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y])
 	
 	for point in board.paths:
-		pygame.draw.rect(surface, WHITE, [lengthSquare * point.x, lengthSquare * point.y, lengthSquare, lengthSquare])
+		pygame.draw.rect(surface, WHITE, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y, lengthSquare, lengthSquare])
 
 	
 
 	for point in board.goals:
-		surface.blit(goal, [lengthSquare * point.x, lengthSquare * point.y])
+		surface.blit(goal, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y])
 
 	point = board.player
-	surface.blit(player, [lengthSquare * point.x, lengthSquare * point.y])
+	surface.blit(player, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y])
 
 	for point in board.boxes:
-		surface.blit(box, [lengthSquare * point.x, lengthSquare * point.y])
+		surface.blit(box, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y])
+
+	display_title()
+
 
 	# print()
 	# i = 1
@@ -315,30 +667,102 @@ def draw_board(board):
 				
 	# i = 0
 	# j = 2
-	
-	
 	pygame.display.flip()
 
 
+mode = 0
+win = 0
+step = 1
+timeTook = 0
+pushed = 0
+startTime = 0
+stepNode = 0
+# time = 0
+# def init_data():
+
 def main():
-	global board
+	global board, level, map_index, step, mode, win, stepNode, timeTook, startTime, pushed
 	while True:
 		clock.tick(FPS)
-
+		print(len(board.history_moves))
+		if board.is_win() == True:
+			win = 1
+		if win == 0:
+			timeTook = time.time() - startTime
 		for event in pygame.event.get():
 			keys_pressed = pygame.key.get_pressed()
 			if event.type == pygame.QUIT or keys_pressed[pygame.K_q]:
 				pygame.quit()
-			elif event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_w or event.key == pygame.K_UP:
-					board.move(U)
-				elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
-					print("adfasd")
-					board.move(D)
-				elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
-					board.move(L)
-				elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-					board.move(R)
+
+
+
+			if event.type == pygame.KEYDOWN:
+				if step == 3:
+					if mode == 1 and win == 0:
+						if event.key == pygame.K_w or event.key == pygame.K_UP:
+							board.move(U)
+							stepNode = board.step
+							pushed = board.pushed
+						elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
+							board.move(D)
+							stepNode = board.step
+							pushed = board.pushed
+						elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
+							board.move(L)
+							stepNode = board.step
+							pushed = board.pushed
+						elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+							board.move(R)
+							stepNode = board.step
+							pushed = board.pushed
+
+			if event.type == pygame.MOUSEBUTTONDOWN:
+				x, y = event.pos
+
+				if step == 1:
+					if up_arrow_rect.collidepoint(x, y):
+						level = (level + 1)%40
+						reset_data()
+					if down_arrow_rect.collidepoint(x,y):
+						level = (level+39)%40
+						reset_data()
+					if change_rect.collidepoint(x,y):
+						map_index = 1 - map_index
+						reset_data()
+					if pick_rect.collidepoint(x,y):
+						step = 2
+
+				if step == 2:
+					if self_rect.collidepoint(x,y):
+						mode = 1
+						step = 3
+						startTime = time.time()
+					if bfs_rect.collidepoint(x,y): 
+						mode = 2
+						step = 3
+						# bfs(board) => Change global win into 1, board = goal_board with new_board
+						# stepNode = board.step
+						# pushed = board.pushed
+						startTime = time.time()
+					if A_rect.collidepoint(x,y):
+						mode = 3
+						step = 3
+						startTime = time.time()
+						# a_star(board)
+
+				if step == 3:
+					if restart_rect.collidepoint(x,y):
+						init_data()
+						step = 1
+					if undo_rect.collidepoint(x,y):
+						board.undo()
+						stepNode = board.step
+						pushed = board.pushed	
+					if redo_rect.collidepoint(x,y):
+						# print("Click redo")
+						board.redo()
+						stepNode = board.step
+						pushed = board.pushed
 
 		draw_board(board)
 
