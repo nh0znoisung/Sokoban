@@ -409,16 +409,20 @@ class Board:
 		# set_available_moves()
 
 	def clear_value(self):
-		self.history_moves = []
+		self.history_moves = [] # List of tuple (Direction, Boolean), Bool for saving we pushed the boxes or not
 		self.available_moves = []
-		self.walls.clear()
-		self.goals.clear()
-		self.boxes.clear()
-		self.paths.clear()
+		self.walls = set() # Consider set or 2d-array for time and space-complexity and since the fixed property
+		self.goals = set()
+		self.boxes = set()
+		self.paths = set()
 		self.player = None
-		self.cost = 1e9
+		self.step = 0
+		self.pushed = 0
+		self.ptr = -1
 		self.x = -1
 		self.y = -1
+		self.ptr = 0
+		self.cost = 1e9  # used for heuristic search: A* algorithm
 
 	def __eq__(self, other):
 		return self.walls == other.walls and self.goals == other.goals and self.boxes == other.boxes and self.player == other.player
@@ -641,9 +645,12 @@ def init_data():
 	pushed = 0
 	startTime = 0
 	stepNode = 0
-	map_index = 0
-	level = 0
-	board = Board()
+
+	# map_index = 0
+	# level = 0
+	# board = Board()
+	# 
+	board.clear_value()
 	reset_data()
 
 
