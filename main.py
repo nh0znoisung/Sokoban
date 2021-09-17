@@ -54,7 +54,7 @@ offsetX = lengthSquare * (numsUnit - numsCol)/2
 offsetY = lengthSquare * (numsUnit - numsRow)/2 
 
 
-# offset
+
 
 background = pygame.image.load("Items/background.jpg")
 background = pygame.transform.scale(background, (WIDTH, WIDTH))
@@ -420,6 +420,10 @@ class Board:
 		self.x = -1
 		self.y = -1
 
+	def __eq__(self, other):
+		return self.walls == other.walls and self.goals == other.goals and self.boxes == other.boxes and self.player == other.player
+
+
 	def add_wall(self, x, y):
 		self.walls.add(Point(x,y))
 
@@ -567,23 +571,19 @@ board = Board()
 
 
 
-
 def reset_data():
 	global board, numsCol, numsRow, numsUnit, lengthSquare, offsetX, offsetY, wall, box, goal, player
 	
 	wall = pygame.image.load('Items/wall.png')
-
 	box = pygame.image.load('Items/box.png')
-
 	goal = pygame.image.load('Items/goal.png')
-
 	player = pygame.image.load('Items/player.png')
 	numsRow, numsCol = board.set_value("./Testcases/{}/{}.txt".format(map_list[map_index], level+1))
 
 	numsUnit = max(numsCol, numsRow)
 	lengthSquare = int(WIDTH/numsUnit)
 
-	print(numsCol, numsRow, numsUnit)
+	print(numsCol, numsRow, numsUnit) #Debug
 
 	offsetX = lengthSquare * (numsUnit - numsRow)/2 
 	offsetY = lengthSquare * (numsUnit - numsCol)/2 
@@ -622,22 +622,28 @@ def reset_data():
 # how to center it
 map_list = ['MINI COSMOS', 'MICRO COSMOS']
 map_index = 0
-level = 0 # (level + 1)%40 + 1
+level = 0
 
 reset_data()
 # reset_data("./Testcases/Mini Cosmos/6.txt")
 
-
-
-
+def init_data():
+	global move, win, step, timeTook, pushed, startTime, stepNode, map_index, level, board, numsRow, numsCol, numsUnit, lengthSquare, offsetX, offsetY
+	mode = 0
+	win = 0
+	step = 1
+	timeTook = 0
+	pushed = 0
+	startTime = 0
+	stepNode = 0
+	map_index = 0
+	level = 0
+	board = Board()
+	reset_data()
 
 
 def draw_board(board):
-	# print("asd")
 	draw_menu()
-	# print("adsf")
-	# offsetX = 0
-	# offsetY = 0
 
 	for point in board.walls:
 		surface.blit(wall, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y])
@@ -658,15 +664,6 @@ def draw_board(board):
 
 	display_title()
 
-
-	# print()
-	# i = 1
-	# j = 1
-	# pygame.draw.rect(surface, GRAY_LIGHT, [lengthSquare * i, lengthSquare * j, lengthSquare, lengthSquare])
-
-				
-	# i = 0
-	# j = 2
 	pygame.display.flip()
 
 
@@ -677,8 +674,8 @@ timeTook = 0
 pushed = 0
 startTime = 0
 stepNode = 0
-# time = 0
-# def init_data():
+
+
 
 def main():
 	global board, level, map_index, step, mode, win, stepNode, timeTook, startTime, pushed
@@ -759,13 +756,14 @@ def main():
 						stepNode = board.step
 						pushed = board.pushed	
 					if redo_rect.collidepoint(x,y):
-						# print("Click redo")
 						board.redo()
 						stepNode = board.step
 						pushed = board.pushed
+					if mode > 1:
+						if visualize_rect.collidepoint(x,y):
+							continue
 
 		draw_board(board)
-
 		pygame.display.update()
 
 if __name__ == '__main__':
