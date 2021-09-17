@@ -1,7 +1,7 @@
 
 
 from queue import Queue
-from copy import deepcopy
+from copy import copy, deepcopy
 from time import time
 class Point:
 	def __init__(self):
@@ -215,6 +215,7 @@ def print_results(board, gen, rep, fre, expl, dur):
 	print("Explored nodes: " + str(expl))
 	print('Duration: ' + str(dur) + 'secs')
 
+
 # implementation of BFS
 # is_win(): Check goal state
 # move(L,R,U,D): Choices for moving
@@ -228,7 +229,7 @@ def bfs(board):
 
 	if (board.is_win()):
 		end = time()
-		print_results(board,1,nodes_repeated,0,end-start)
+		print_results(board,1,nodes_repeated,0,0,end-start)
 		return 
 	frontier = Queue()
 	explored = set()
@@ -242,14 +243,15 @@ def bfs(board):
 		node = frontier.get()
 		explored.add(node)
 		for m in node.available_moves:
-			node.move(m)
 			child = deepcopy(node)
-			if child not in explored:
+			child.move(m)
+			if child not in explored: #(child not in frontier):
 				if (child.is_win()):
 					end = time()
 					print_results(child,0,0,0,0,end-start)	
-					return 
+					return child
 				frontier.put(child)
+	return 
 				
 
 bfs(board)
