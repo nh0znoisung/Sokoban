@@ -1,8 +1,39 @@
 
 
+from main import check_one_digit
+from os import truncate
 from queue import Queue
 from copy import copy, deepcopy
 from time import time
+
+class MyQueue:
+
+    '''
+    Custom FIFO queue that keeps track of a queue in a list
+    '''
+
+    def __init__(self):
+        self.q = []
+
+    def push(self, x):
+        ''' inserts at the beginning of the list '''
+        self.q.insert(0, x)
+
+    def pop(self):
+        ''' removes the first item in the list '''
+        return self.q.pop(0)
+
+    def isEmpty(self):
+        ''' checks for empty list '''
+        if len(self.q) == 0:
+            return True
+
+    def __len__(self):
+        ''' overriding len() '''
+        return len(self.q)
+
+
+
 class Point:
 	def __init__(self):
 		self.x = -1
@@ -43,6 +74,9 @@ class Point:
 
 	def __hash__(self):
 		return hash(self.__key())
+
+	def get_point(self):
+		print("(" + str(self.x) + "," + str(self.y) + ")")
     
 class Direction:
 	'''
@@ -73,6 +107,7 @@ class Board:
 	# Set for finding and adding operator with time complexity O(logn), with already function such as union(), issubset(),..
 	def __init__(self):
 		# self.dir_list = dir_list  # list of directions for solution
+		self.name = ''
 		self.history_moves = [] # List of tuple (Direction, Boolean), Bool for saving we pushed the boxes or not
 		self.available_moves = []
 		self.walls = set() # Consider set or 2d-array for time and space-complexity and since the fixed property
@@ -80,16 +115,40 @@ class Board:
 		self.boxes = set()
 		self.paths = set()
 		self.player = None
+		self.step = 0
+		self.pushed = 0
+		self.ptr = -1
+		self.x = -1
+		self.y = -1
+		self.ptr = 0
 		self.cost = 1e9  # used for heuristic search: A* algorithm
 		# set_available_moves()
 
 	def clear_value(self):
-		self.walls.clear()
-		self.goals.clear()
-		self.boxes.clear()
-		self.paths.clear()
+		self.name = ''
+		self.history_moves = [] # List of tuple (Direction, Boolean), Bool for saving we pushed the boxes or not
+		self.available_moves = []
+		self.walls = set() # Consider set or 2d-array for time and space-complexity and since the fixed property
+		self.goals = set()
+		self.boxes = set()
+		self.paths = set()
 		self.player = None
-		self.cost = 1e9
+		self.step = 0
+		self.pushed = 0
+		self.ptr = -1
+		self.x = -1
+		self.y = -1
+		self.ptr = 0
+		self.cost = 1e9  # used for heuristic search: A* algorithm
+
+	def __eq__(self, other):
+		return (self.walls == other.walls) and (self.goals == other.goals) and (self.boxes == other.boxes) and (self.player == other.player)
+
+	def __key(self):
+		return (self.name)
+
+	def __hash__(self):
+		return hash(self.__key())
 
 	def add_wall(self, x, y):
 		self.walls.add(Point(x,y))
@@ -106,6 +165,10 @@ class Board:
 	def add_player(self, x, y):
 		self.player = Point(x,y)
 
+	def direction_in_available(self,m):
+		for i in self.available_moves:
+			if (i.get_char() == m.get_char()): return True
+		return False
 	
 
 	# Rule for moving in SOKOBAN map, the rules below will apply for 4 directions: UP, DOWN, LEFT, RIGHT
@@ -133,17 +196,24 @@ class Board:
 
 
 	# --- We think about this not just for solving a game, we can play it by control the keyboard. So if when we have illegal move, just cost O(logn)
+	
+
 
 	def move(self, direction):
 		# print("adfbaksd
 		# self.player.x += 1
 		# print(direction.vector.x)
-
 		# move the player with direction but the argument make sure direction in the available_moves() 
-		if direction in self.available_moves:
+		if (self.direction_in_available(direction)):
+			self.ptr += 1
+			if self.ptr < len(self.history_moves):
+				# Cut the list
+				self.history_moves = self.history_moves[0:self.ptr]
 			temp = self.player + direction.vector
+			self.step += 1
 			if temp in self.boxes:
 				# We push the box forward, so we need to remove the current position and add the forward position
+				self.pushed += 1
 				self.boxes.remove(temp)
 				self.boxes.add(temp + direction.vector)
 				self.history_moves.append(Move(direction, 1))
@@ -154,21 +224,29 @@ class Board:
 		self.set_available_moves()
 
 
-	def undo(self, direction):
-		if len(self.history_moves) > 0:
-			move = self.history_moves[-1]
+	def undo(self):
+		if self.ptr > 0:
+			self.ptr -= 1
+			move = self.history_moves[self.ptr]
 			if move.pushed == 1:
-				self.boxes.remove(self.player + direction)
+				self.pushed -= 1
+				self.boxes.remove(self.player + move.direction.vector)
 				self.boxes.add(self.player)
 
-			self.player = self.player - direction
-			self.history_moves.pop()
+			self.player = self.player - move.direction.vector
+			self.step -= 1
+			# self.history_moves.pop()
 		self.set_available_moves()
+
+
+	def redo(self):
+		if self.ptr < len(self.history_moves):
+			self.move(self.history_moves[self.ptr])
+			self.ptr += 1
 
 	# def dfs(): => In same class or more function ?? 
 	# def a_star():
 
-	
 
 	def is_win(self):
 		if self.goals.issubset(self.boxes):
@@ -177,12 +255,15 @@ class Board:
 			return False
 
 	def set_value(self, filename):
+		self.clear_value()
+		self.name = filename
+		x = 0
+		y = 0
 		with open(filename, 'r') as f:
 			read_data = f.read()
-			lines = read_data.split('\n')
-			x = 0
-			y = 0
+			lines = read_data.split('\n')	
 			for line in lines:
+				x = 0
 				for char in line:
 					if char == '#': # Wall
 						self.add_wall(x,y)
@@ -195,25 +276,55 @@ class Board:
 					elif char == '@': # Player
 						self.add_player(x,y)
 						self.add_path(x,y)
+					elif char == '-':
+						self.add_goal(x,y)
+						self.add_player(x,y)
+						self.add_path(x,y)
+					elif char == '+':
+						self.add_goal(x,y)
+						self.add_box(x,y)
+						self.add_path(x,y)
 					elif char == '.': # Path - avaiable move
 						self.add_path(x,y)
 				
 					x += 1
-				x = 0
 				y += 1
-
 		self.set_available_moves()
+		return (x,y)
+
 
 board = Board()
 board.set_value("test_1.txt")
 
+
 def print_results(board, gen, rep, fre, expl, dur):
 	print("\n1. Breadth first search")
-	print("Solution: "	)
-	print("Nodes generated: " + str(gen))
-	print("Nodes repeated: " + str(rep))
-	print("Explored nodes: " + str(expl))
 	print('Duration: ' + str(dur) + 'secs')
+
+def equalSet(child,explored):
+	for ele in explored:
+		if (child.__eq__(ele)): return True
+	return False
+
+def print_player(node):
+	node.player.get_point()
+
+def print_box(node):
+	for i in node.boxes:
+		i.get_point()
+		print(" ",end = '')
+
+
+def print_status(node):
+	for m in node.available_moves:
+		print(m.get_char(),end=" ")
+	print()
+	print("Position of player",end = "")
+	print_player(node)
+	print("Position of box", end="")
+	print_box(node)
+	print()
+
 
 
 # implementation of BFS
@@ -223,35 +334,50 @@ def print_results(board, gen, rep, fre, expl, dur):
 # OUTPUT:-> print() to a file named result.txt
 def bfs(board):
 	start = time()
-	nodes_generated = 0
-	nodes_repeated = 0
-	nodes_freeze = 0
-
+	
 	if (board.is_win()):
 		end = time()
-		print_results(board,1,nodes_repeated,0,0,end-start)
+		print_results(board,1,0,0,0,end-start)
 		return 
-	frontier = Queue()
+	frontier = MyQueue()
 	explored = set()
-	frontier.put(board)
+	frontier.push(board)
 	stayed_Searching = True
 
+	i = 0
 	while stayed_Searching:
-		if frontier.empty():
+		if (i == 18): 
+			print("Debug session")
+		i = i + 1
+		if frontier.isEmpty():
 			print("Solution not found\n")
+			print(i)
 			return
-		node = frontier.get()
+		print("Start loop " + str(i) + " at node: ",end="")
+		
+		node = frontier.pop()
+		moves = node.available_moves
 		explored.add(node)
-		for m in node.available_moves:
+
+		print_status(node)
+
+		print("child from loop " + str(i))
+		for m in moves:
 			child = deepcopy(node)
 			child.move(m)
-			if child not in explored: #(child not in frontier):
+			if (child not in explored): #(child not in frontier):
 				if (child.is_win()):
 					end = time()
 					print_results(child,0,0,0,0,end-start)	
 					return child
-				frontier.put(child)
-	return 
+				frontier.push(child)
+				print_status(child)
+		print()
+	print(i)
+
 				
 
 bfs(board)
+
+
+
