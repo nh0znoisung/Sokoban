@@ -298,7 +298,12 @@ board.set_value("test_1.txt")
 
 
 def print_results(board, gen, rep, fre, expl, dur):
-	print("\n1. Breadth first search")
+	print("1. Breadth first search:")
+	print("Sequence: ",end="")
+	for ch in board.history_moves:
+		print(ch.direction.char,end=" ")
+	print()
+	print(len(board.history_moves))
 	print('Duration: ' + str(dur) + 'secs')
 
 def equalSet(child,explored):
