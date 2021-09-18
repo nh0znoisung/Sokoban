@@ -17,7 +17,8 @@ class MyQueue:
 
     def push(self, x):
         ''' inserts at the beginning of the list '''
-        self.q.insert(0, x)
+        # self.q.insert(0, x)
+        self.q.append(x)
 
     def pop(self):
         ''' removes the first item in the list '''
@@ -384,5 +385,5 @@ def bfs(board):
 
 bfs(board)
 
-
+# R R U R R U U L L L D L L U U R L D D R R R D R R U U L U U L L D D R R R D D L L D L L U U R L L U U R R D R R R D D L L U L L L U U R R D R 
 
