@@ -1,7 +1,34 @@
 
-from queue import Queue
+from queue import LifoQueue
 from copy import copy, deepcopy
 from time import time
+
+class MyQueue:
+
+    '''
+    Custom FIFO queue that keeps track of a queue in a list
+    '''
+
+    def __init__(self):
+        self.q = []
+
+    def push(self, x):
+        ''' inserts at the beginning of the list '''
+        self.q.insert(0, x)
+
+    def pop(self):
+        ''' removes the first item in the list '''
+        return self.q.pop(0)
+
+    def isEmpty(self):
+        ''' checks for empty list '''
+        if len(self.q) == 0:
+            return True
+
+    def __len__(self):
+        ''' overriding len() '''
+        return len(self.q)
+
 
 class Point:
 	def __init__(self):
@@ -18,10 +45,10 @@ class Point:
 		else:
 			return False
 
-	# 
-	# def __hash__(self):
-	#     return hash((self.x, self.y))
-	
+    # 
+    # def __hash__(self):
+    #     return hash((self.x, self.y))
+    
 
 	# Magic method: https://www.python-course.eu/python3_magic_methods.php
 	def __add__(self, point):
@@ -37,7 +64,7 @@ class Point:
 	def double(self):
 		return Point(self.x*2, self.y*2)
 
-	# Error unhashable type
+    # Error unhashable type
 	def __key(self):
 		return (self.x, self.y)
 
@@ -46,7 +73,7 @@ class Point:
 
 	def get_point(self):
 		print("(" + str(self.x) + "," + str(self.y) + ")")
-	
+    
 class Direction:
 	'''
 	vector: we can define it as object of class Point that we have define above, so that we can add 2 Point or double it for checking
@@ -266,6 +293,18 @@ board = Board()
 board.set_value("./Testcases/Mini Cosmos/2.txt")
 
 
+def print_results(board, gen, rep, fri, expl, dur):
+	print("Depth first search:")
+	print("Solution: ",end="")
+	for ch in board.history_moves:
+		print(ch.direction.char,end=" ")
+	print()
+	print("Node generated: " + str(gen))
+	print("Nodes repeated: " + str(rep))
+	print("Fringe nodes: " + str(fri))
+	print("Explored nodes: " + str(expl))
+	print('Duration: ' + str(dur) + 'secs')
+
 def equalSet(child,explored):
 	for ele in explored:
 		if (child.__eq__(ele)): return True
@@ -290,17 +329,6 @@ def print_status(node):
 	print_box(node)
 	print()
 
-def print_results(board, gen, rep, fri, expl, dur):
-	print ("Breadth-first search")
-	print ("Solution: ",end="")
-	for ch in board.history_moves:
-		print(ch.direction.char,end=" ")
-	print()
-	print ("Nodes generated: " + str(gen))
-	print ("Nodes repeated: " + str(rep))
-	print ("Fringe nodes: " + str(fri))
-	print ("Explored nodes: " + str(expl))
-	print ('Duration: ' + str(dur) + ' secs')
 
 
 # implementation of BFS
@@ -308,19 +336,23 @@ def print_results(board, gen, rep, fri, expl, dur):
 # move(L,R,U,D): Choices for moving
 # board.available_moves: Create a list of available_moves
 # OUTPUT:-> print() to a file named result.txt
-def bfs(board):
+def dfs(board):
 	start = time()
 	nodeGenerated = 0
 	nodeRepeated = 0
+
 	if (board.is_win()):
 		end = time()
-		print_results(board,1,0,0,1,end-start)
+		print_results(board,1,0,end-start)
 		return 
-	frontier = Queue()
+	frontier = LifoQueue()
 	explored = set()
 	frontier.put(board)
-	stayed_Searching = True
+
 	nodeGenerated += 1
+
+	stayed_Searching = True
+
 	i = 0
 	while stayed_Searching:
 		i = i + 1
@@ -355,7 +387,7 @@ def bfs(board):
 
 				
 
-bfs(board)
+dfs(board)
 
 
 
