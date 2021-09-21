@@ -18,16 +18,9 @@ class Point:
         else:
             return False
 
-<<<<<<< HEAD
-	# 
-	# def __hash__(self):
-	#     return hash((self.x, self.y))
-	
-=======
     #
     # def __hash__(self):
     #     return hash((self.x, self.y))
->>>>>>> 21c67baf816916a0d03d2366eb4519a92ec0420e
 
     # Magic method: https://www.python-course.eu/python3_magic_methods.php
 
@@ -44,11 +37,6 @@ class Point:
     def double(self):
         return Point(self.x*2, self.y*2)
 
-<<<<<<< HEAD
-	# Error unhashable type
-	def __key(self):
-		return (self.x, self.y)
-=======
     # Error unhashable type
     def __key(self):
         return (self.x, self.y)
@@ -58,15 +46,8 @@ class Point:
 
     def get_point(self):
         print("(" + str(self.x) + "," + str(self.y) + ")")
->>>>>>> 21c67baf816916a0d03d2366eb4519a92ec0420e
 
 
-<<<<<<< HEAD
-	def get_point(self):
-		print("(" + str(self.x) + "," + str(self.y) + ")")
-	
-=======
->>>>>>> 21c67baf816916a0d03d2366eb4519a92ec0420e
 class Direction:
     '''
     vector: we can define it as object of class Point that we have define above, so that we can add 2 Point or double it for checking
@@ -286,16 +267,10 @@ class Board:
 
 
 board = Board()
-board.set_value("./Testcases/Mini Cosmos/2.txt")
+test = "./Testcases/Mini Cosmos/5.txt"
+board.set_value(test)
 
-<<<<<<< HEAD
-
-def equalSet(child,explored):
-	for ele in explored:
-		if (child.__eq__(ele)): return True
-	return False
-=======
-def print_results(board, gen, rep, fre, expl, dur):
+def print_results(board, dur):
     print("1. Breadth first search:")
     print("Sequence: ", end="")
     for ch in board.history_moves:
@@ -311,7 +286,6 @@ def equalSet(child, explored):
             return True
     return False
 
->>>>>>> 21c67baf816916a0d03d2366eb4519a92ec0420e
 
 def print_player(node):
     node.player.get_point()
@@ -324,28 +298,6 @@ def print_box(node):
 
 
 def print_status(node):
-<<<<<<< HEAD
-	for m in node.available_moves:
-		print(m.get_char(),end=" ")
-	print()
-	print("Position of player",end = "")
-	print_player(node)
-	print("Position of box", end="")
-	print_box(node)
-	print()
-
-def print_results(board, gen, rep, fri, expl, dur):
-	print ("Breadth-first search")
-	print ("Solution: ",end="")
-	for ch in board.history_moves:
-		print(ch.direction.char,end=" ")
-	print()
-	print ("Nodes generated: " + str(gen))
-	print ("Nodes repeated: " + str(rep))
-	print ("Fringe nodes: " + str(fri))
-	print ("Explored nodes: " + str(expl))
-	print ('Duration: ' + str(dur) + ' secs')
-=======
     for m in node.available_moves:
         print(m.get_char(), end=" ")
     print()
@@ -354,7 +306,6 @@ def print_results(board, gen, rep, fri, expl, dur):
     print("Position of box", end="")
     print_box(node)
     print()
->>>>>>> 21c67baf816916a0d03d2366eb4519a92ec0420e
 
 
 # implementation of BFS
@@ -363,97 +314,47 @@ def print_results(board, gen, rep, fri, expl, dur):
 # board.available_moves: Create a list of available_moves
 # OUTPUT:-> print() to a file named result.txt
 def bfs(board):
-<<<<<<< HEAD
-	start = time()
-	nodeGenerated = 0
-	nodeRepeated = 0
-	if (board.is_win()):
-		end = time()
-		print_results(board,1,0,0,1,end-start)
-		return 
-	frontier = Queue()
-	explored = set()
-	frontier.put(board)
-	stayed_Searching = True
-	nodeGenerated += 1
-	i = 0
-	while stayed_Searching:
-		i = i + 1
-		if frontier.empty():
-			print("Solution not found\n")
-			print(i)
-			return
-		print("Start loop " + str(i) + " at node: ",end="")
-		
-		node = frontier.get()
-		moves = node.available_moves
-		explored.add(node)
-
-		print_status(node)
-
-		print("child from loop " + str(i))
-		for m in moves:
-			nodeGenerated += 1
-			child = deepcopy(node)
-			child.move(m)
-			if (child not in explored): #(child not in frontier):
-				if (child.is_win()):
-					end = time()
-					print_results(child,nodeGenerated,nodeRepeated,frontier.qsize(),len(explored),end-start)	
-					return child
-				frontier.put(child)
-				print_status(child)
-			else:
-				nodeRepeated += 1
-		print()
-	print(i)
-
-				
-
-bfs(board)
-=======
+    print(test)
     start = time()
 
     if (board.is_win()):
         end = time()
         print_results(board, 1, 0, 0, 0, end-start)
         return
-    frontier = MyQueue()
+    frontier = Queue()
     explored = set()
-    frontier.push(board)
+    frontier.put(board)
     stayed_Searching = True
 
-    i = 0
+    #i = 0
     while stayed_Searching:
-        if (i == 18):
-            print("Debug session")
-        i = i + 1
-        if frontier.isEmpty():
+        #i = i + 1
+        if frontier.empty():
             print("Solution not found\n")
-            print(i)
             return
-        print("Start loop " + str(i) + " at node: ", end="")
+        #print("Start loop " + str(i) + " at node: ", end="")
 
-        node = frontier.pop()
+        node = frontier.get()
         moves = node.available_moves
         explored.add(node)
 
-        print_status(node)
+        #print_status(node)
 
-        print("child from loop " + str(i))
+        #print("child from loop " + str(i))
         for m in moves:
             child = deepcopy(node)
             child.move(m)
             if (child not in explored):  # (child not in frontier):
                 if (child.is_win()):
                     end = time()
-                    print_results(child, 0, 0, 0, 0, end-start)
+                    print_results(child,end-start)
                     return child
-                frontier.push(child)
-                print_status(child)
-        print()
-    print(i)
->>>>>>> 21c67baf816916a0d03d2366eb4519a92ec0420e
+                frontier.put(child)
+                #print_status(child)
+            end = time()
+            assert end - start < 300, "Time limit exceeded"
+        #print()
+    #print(i)
 
 
 bfs(board)

@@ -3,6 +3,7 @@ from queue import LifoQueue
 from copy import copy, deepcopy
 from time import time
 
+
 class MyQueue:
 
     '''
@@ -290,7 +291,8 @@ class Board:
 
 
 board = Board()
-board.set_value("./Testcases/Mini Cosmos/2.txt")
+test = "./Testcases/Mini Cosmos/1.txt"
+board.set_value("./Testcases/Mini Cosmos/1.txt")
 
 
 def print_results(board, gen, rep, fri, expl, dur):
@@ -353,22 +355,22 @@ def dfs(board):
 
 	stayed_Searching = True
 
-	i = 0
+	#i = 0
 	while stayed_Searching:
-		i = i + 1
+		#i = i + 1
 		if frontier.empty():
 			print("Solution not found\n")
-			print(i)
+			#print(i)
 			return
-		print("Start loop " + str(i) + " at node: ",end="")
+		#print("Start loop " + str(i) + " at node: ",end="")
 		
 		node = frontier.get()
 		moves = node.available_moves
 		explored.add(node)
 
-		print_status(node)
+		#print_status(node)
 
-		print("child from loop " + str(i))
+		#print("child from loop " + str(i))
 		for m in moves:
 			nodeGenerated += 1
 			child = deepcopy(node)
@@ -382,8 +384,10 @@ def dfs(board):
 				print_status(child)
 			else:
 				nodeRepeated += 1
-		print()
-	print(i)
+		#print()
+		end = time()
+		assert (end-start) > 300, "Time limit exceeded"
+	#print(i)
 
 				
 
