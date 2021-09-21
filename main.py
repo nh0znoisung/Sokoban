@@ -3,6 +3,8 @@ import time
 from pygame.locals import *
 import os
 import psutil
+from queue import Queue
+from copy import copy, deepcopy
 
 successes, failures = pygame.init()
 print("{0} successes and {1} failures".format(successes, failures))
@@ -52,8 +54,6 @@ lengthSquare = int(WIDTH/numsUnit)
 
 offsetX = lengthSquare * (numsUnit - numsCol)/2 
 offsetY = lengthSquare * (numsUnit - numsRow)/2 
-
-
 
 
 background = pygame.image.load("Items/background.jpg")
@@ -110,8 +110,8 @@ undo_rect = Rect(700 + 90, 0 + 410, 50, 40)
 redo_rect = Rect(700 + 285, 0 + 410, 50, 40)
 
 def display_title():
-    menuText = menuFont.render("SOKOBAN", True, ORANGE)
-    surface.blit(menuText, [700 + 35, 0 + 20])
+	menuText = menuFont.render("SOKOBAN", True, ORANGE)
+	surface.blit(menuText, [700 + 35, 0 + 20])
 
 def display_background():
 	surface.blit(background, [0, 0])
@@ -337,10 +337,10 @@ class Point:
 		else:
 			return False
 
-    # 
-    # def __hash__(self):
-    #     return hash((self.x, self.y))
-    
+	# 
+	# def __hash__(self):
+	#     return hash((self.x, self.y))
+	
 
 	# Magic method: https://www.python-course.eu/python3_magic_methods.php
 	def __add__(self, point):
@@ -356,13 +356,13 @@ class Point:
 	def double(self):
 		return Point(self.x*2, self.y*2)
 
-    # Error unhashable type
+	# Error unhashable type
 	def __key(self):
 		return (self.x, self.y)
 
 	def __hash__(self):
 		return hash(self.__key())
-    
+	
 class Direction:
 	'''
 	vector: we can define it as object of class Point that we have define above, so that we can add 2 Point or double it for checking
@@ -385,7 +385,7 @@ L = Direction(Point(-1, 0), 'L') # a point or vector and a character that repres
 R = Direction(Point(1, 0), 'R')
 U = Direction(Point(0, -1), 'U')
 D = Direction(Point(0, 1), 'D')
-directions = [U, D, L, R]
+directions = [U, L, D, R] #clockwise
 
 class Board:
 	# Use what DataStructure for saving wall, goal, box, player
@@ -399,13 +399,14 @@ class Board:
 		self.goals = set()
 		self.boxes = set()
 		self.paths = set()
+		self.lose = -1
 		self.player = None
 		self.step = 0
 		self.pushed = 0
 		self.ptr = -1
 		self.x = -1
 		self.y = -1
-		self.ptr = 0
+		# self.ptr = 0
 		self.cost = 1e9  # used for heuristic search: A* algorithm
 		# set_available_moves()
 
@@ -417,13 +418,13 @@ class Board:
 		self.goals = set()
 		self.boxes = set()
 		self.paths = set()
+		self.lose = -1
 		self.player = None
 		self.step = 0
 		self.pushed = 0
 		self.ptr = -1
 		self.x = -1
 		self.y = -1
-		self.ptr = 0
 		self.cost = 1e9  # used for heuristic search: A* algorithm
 
 	def __eq__(self, other):
@@ -450,7 +451,6 @@ class Board:
 	def add_player(self, x, y):
 		self.player = Point(x,y)
 
-	
 
 	# Rule for moving in SOKOBAN map, the rules below will apply for 4 directions: UP, DOWN, LEFT, RIGHT
 	# Rule 1: If the forward cell is empty, we literally can move
@@ -478,35 +478,59 @@ class Board:
 
 	# --- We think about this not just for solving a game, we can play it by control the keyboard. So if when we have illegal move, just cost O(logn)
 
-	def move(self, direction):
-		# print("adfbaksd
-		# self.player.x += 1
-		# print(direction.vector.x)
-
+	def move(self, direction, redo = False, move = True):
+		
 		# move the player with direction but the argument make sure direction in the available_moves() 
 		if direction in self.available_moves:
 			self.ptr += 1
-			if self.ptr < len(self.history_moves):
-				# Cut the list
-				self.history_moves = self.history_moves[0:self.ptr]
+			if move == True:
+				if self.ptr < len(self.history_moves) - 1:
+					# Cut the list
+					self.history_moves = self.history_moves[0:self.ptr]
+				if self.ptr < self.lose:
+					self.lose = -1 
 			temp = self.player + direction.vector
+			
 			self.step += 1
 			if temp in self.boxes:
 				# We push the box forward, so we need to remove the current position and add the forward position
 				self.pushed += 1
 				self.boxes.remove(temp)
 				self.boxes.add(temp + direction.vector)
-				self.history_moves.append(Move(direction, 1))
+				if redo == False:
+					self.history_moves.append(Move(direction, 1))
+
+				# Check True or NotImplemented
+				if self.lose == -1:
+					curr_box = temp + direction.vector
+					checkdir_list = []
+					for direct in directions:
+						if curr_box + direct.vector in self.walls:
+							checkdir_list.append(True)
+						else:
+							checkdir_list.append(False)
+					res = False
+					for i in range(4):
+						if checkdir_list[i] and checkdir_list[(i+1)%4]:
+							res = True
+							break
+					if res:
+						if curr_box not in self.goals:
+							self.lose = self.ptr
 			else:
-				self.history_moves.append(Move(direction, 0))
+				if redo == False:
+					self.history_moves.append(Move(direction, 0))
 
 			self.player = temp
 		self.set_available_moves()
+		print(self.ptr, len(self.history_moves))
+		print("Lose: ",self.lose)
 
 
 	def undo(self):
-		if self.ptr > 0:
-			self.ptr -= 1
+		
+		if self.ptr > -1:
+			
 			move = self.history_moves[self.ptr]
 			if move.pushed == 1:
 				self.pushed -= 1
@@ -515,17 +539,26 @@ class Board:
 
 			self.player = self.player - move.direction.vector
 			self.step -= 1
+			self.ptr -= 1
 			# self.history_moves.pop()
 		self.set_available_moves()
+		print(self.ptr, len(self.history_moves))
 
 
 	def redo(self):
-		if self.ptr < len(self.history_moves):
-			self.move(self.history_moves[self.ptr])
-			self.ptr += 1
+		
+		if self.ptr < len(self.history_moves) - 1:
+			self.move(self.history_moves[self.ptr + 1].direction, redo = True, move = False)
+			# self.ptr += 1
+		print(self.ptr, len(self.history_moves))
 
 	# def dfs(): => In same class or more function ?? 
 	# def a_star():
+	def is_lose(self):
+		if self.lose != -1:
+			if self.ptr >= self.lose:
+				return True
+		return False
 
 
 	def is_win(self):
@@ -569,6 +602,7 @@ class Board:
 				
 					x += 1
 				y += 1
+			# print(x,y)
 		self.set_available_moves()
 		return (x,y)
 
@@ -682,6 +716,52 @@ def draw_board(board):
 	pygame.display.flip()
 
 
+def print_results(board, dur):
+	print("1. Breadth first search:")
+	print("Sequence: ", end="")
+	for ch in board.history_moves:
+		print(ch.direction.char, end=" ")
+	print()
+	print(len(board.history_moves))
+	print('Duration: ' + str(dur) + 'secs')
+
+def bfs(board):
+	# print(test)
+	global win
+	# start = time()
+
+	if (board.is_win()):
+		# end = time()
+		# print_results(board, 1, 0, 0, 0, end-start)
+		return
+	frontier = Queue()
+	explored = set()
+	frontier.put(board)
+	stayed_Searching = True
+
+	while stayed_Searching:
+		if frontier.empty():
+			print("Solution not found\n")
+			return
+		node = frontier.get()
+		moves = node.available_moves
+		explored.add(node)
+
+		for m in moves:
+			child = deepcopy(node)
+			child.move(m)
+			if (child not in explored) and child.is_lose == False:
+				if (child.is_win()):
+					win = 1
+					# end = time()
+					# print_results(child,end-start)
+					# board = deepcopy(child)
+					return child.history_moves
+				frontier.put(child)
+			# end = time()
+			# assert end - start < 300, "Time limit exceeded"
+
+
 mode = 0
 win = 0
 step = 1
@@ -690,15 +770,16 @@ pushed = 0
 startTime = 0
 stepNode = 0
 
-
+visualized = 0
 
 def main():
 	global board, level, map_index, step, mode, win, stepNode, timeTook, startTime, pushed
 	while True:
 		clock.tick(FPS)
-		print(len(board.history_moves))
+		# print(len(board.history_moves))
 		if board.is_win() == True:
 			win = 1
+			# This result has been recorded in Results folder
 		if win == 0:
 			timeTook = time.time() - startTime
 		for event in pygame.event.get():
@@ -763,20 +844,42 @@ def main():
 						# a_star(board)
 
 				if step == 3:
-					if restart_rect.collidepoint(x,y):
-						init_data()
-						step = 1
-					if undo_rect.collidepoint(x,y):
-						board.undo()
-						stepNode = board.step
-						pushed = board.pushed	
-					if redo_rect.collidepoint(x,y):
-						board.redo()
-						stepNode = board.step
-						pushed = board.pushed
+					if mode == 1:
+						if restart_rect.collidepoint(x,y):
+							init_data()
+							step = 1
+						if undo_rect.collidepoint(x,y):
+							board.undo()
+							stepNode = board.step
+							pushed = board.pushed	
+						if redo_rect.collidepoint(x,y):
+							board.redo()
+							stepNode = board.step
+							pushed = board.pushed
+					if mode == 2:
+						#Bfs
+						moves = bfs(board)
+						if win == 1:
+							if visualized == 0:
+								if visualize_rect.collidepoint(x,y):
+									for move in moves:
+										board.move(move.direction)
+							else:
+								if restart_rect.collidepoint(x,y):
+									init_data()
+									step = 1
+								if undo_rect.collidepoint(x,y):
+									board.undo()
+									stepNode = board.step
+									pushed = board.pushed	
+								if redo_rect.collidepoint(x,y):
+									board.redo()
+									stepNode = board.step
+									pushed = board.pushed
+					if mode == 3:
+						continue
 					if mode > 1:
-						if visualize_rect.collidepoint(x,y):
-							continue
+						continue
 
 		draw_board(board)
 		pygame.display.update()
