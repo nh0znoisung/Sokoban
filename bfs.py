@@ -267,16 +267,19 @@ class Board:
 
 
 board = Board()
-test = "./Testcases/Mini Cosmos/5.txt"
+test = "./Testcases/Mini Cosmos/1.txt"
 board.set_value(test)
 
-def print_results(board, dur):
+def print_results(board, gen, rep, expl, dur):
     print("1. Breadth first search:")
     print("Sequence: ", end="")
     for ch in board.history_moves:
         print(ch.direction.char, end=" ")
     print()
     print(len(board.history_moves))
+    print("Node generated: " + str(gen))
+    print("Node repeated: " + str(rep))
+    print("Node explored: " + str(expl))
     print('Duration: ' + str(dur) + 'secs')
 
 
@@ -316,16 +319,18 @@ def print_status(node):
 def bfs(board):
     print(test)
     start = time()
-
+    node_generated = 0
+    node_repeated = 0
     if (board.is_win()):
         end = time()
-        print_results(board, 1, 0, 0, 0, end-start)
+        print_results(board, 1, 0, 0, end-start)
         return
     frontier = Queue()
     explored = set()
     frontier.put(board)
     stayed_Searching = True
-
+    
+    node_generated += 1
     #i = 0
     while stayed_Searching:
         #i = i + 1
@@ -347,10 +352,13 @@ def bfs(board):
             if (child not in explored):  # (child not in frontier):
                 if (child.is_win()):
                     end = time()
-                    print_results(child,end-start)
+                    print_results(child,node_generated,node_repeated,len(explored),end-start)
                     return child
                 frontier.put(child)
                 #print_status(child)
+            else:
+                node_repeated += 1
+            node_generated += 1
             end = time()
             assert end - start < 300, "Time limit exceeded"
         #print()
