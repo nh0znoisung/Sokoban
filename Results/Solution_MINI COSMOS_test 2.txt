@@ -1,0 +1,16 @@
+Datatime (UTC+7): 22/09/2021 23:13:01 PM
+Problem: Testcases/MINI COSMOS/2.txt
+Algorithm: Breadth First Search
+Solution: R, R, U, U, L, L, L, U, U, R, L, D, D, R, R, U, R, R, U, U, L, L, D, D, U, L, L, D, D, R, R, U, R, R, R, D, D, L, L, D, L, L, U, D, R, R, U, U, L, U, U, L, L, D, D, R, R, U, R, D
+Step: 60
+Nodes generated: 2523
+Nodes repeated: 1346
+Nodes explored: 622
+Memory: 23.55078125 MB
+Duration: 39.199694871902466 secs
+
+
+===================================================
+===================================================
+
+

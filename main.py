@@ -5,6 +5,7 @@ import os
 import psutil
 from queue import Queue
 from copy import copy, deepcopy
+from datetime import datetime
 
 successes, failures = pygame.init()
 print("{0} successes and {1} failures".format(successes, failures))
@@ -37,6 +38,7 @@ GREEN_DARK = (0, 255, 0)
 menuFont = pygame.font.SysFont("CopperPlate Gothic", 60, bold = True)  
 helpFont = pygame.font.SysFont("Comic Sans MS", 25)      
 wordFont = pygame.font.SysFont("CopperPlate Gothic",25)  
+recordFont = pygame.font.SysFont("Comic Sans MS",17)  
 mapFont = pygame.font.SysFont("Comic Sans MS", 20, bold = True)   
 levelFont = pygame.font.SysFont("Comic Sans MS", 25, bold = True)  
 buttonFont = pygame.font.SysFont("CopperPlate Gothic", 18, bold = True)
@@ -184,7 +186,9 @@ def display_button_A():
 	step7Text = buttonFont.render("A*", True, YELLOW_LIGHT)
 	surface.blit(step7Text, [700 + 313, 318])
 
-
+def display_record():
+	recordText = recordFont.render("The solution has been recorded in Results folder", True, RED)
+	surface.blit(recordText, [700 + 10, 0 + 612])
 
 
 def display_title_step_3(color = RED):
@@ -193,14 +197,16 @@ def display_title_step_3(color = RED):
 
 def display_title_content_step_3(color = BROWN):
 	statusText = helpFont.render("Status:", True, color)
-	attemptedText = helpFont.render("Time:", True, color)
-	stepText = helpFont.render("Step:", True, color)
-	pushedText = helpFont.render("Pushed:", True, color)
 	surface.blit(statusText, [700 + 26, 0 + 455])
-	surface.blit(attemptedText, [700 + 30, 0 + 503])
-	surface.blit(stepText, [700 + 30, 0 + 550])
-	surface.blit(pushedText, [700 + 30, 0 + 600])
 
+	if not (mode >= 2 and win == 0):
+		attemptedText = helpFont.render("Time:", True, color)
+		stepText = helpFont.render("Step:", True, color)
+		pushedText = helpFont.render("Pushed:", True, color)
+
+		surface.blit(attemptedText, [700 + 30, 0 + 493])
+		surface.blit(stepText, [700 + 30, 0 + 530])
+		surface.blit(pushedText, [700 + 30, 0 + 570])
 
 def display_content_step_3():
 	status_str = ""
@@ -218,22 +224,27 @@ def display_content_step_3():
 		status_col = GREEN_DARK
 
 	statusText = wordFont.render(f"{status_str}", True, status_col)
-	timeText = helpFont.render("{:0.3f} s".format(timeTook), True, GREEN_LIGHT)
-	stepText = helpFont.render(f"{stepNode}", True, GREEN_LIGHT)
-	pushedText = helpFont.render(f"{pushed}", True, GREEN_LIGHT)
-
 	surface.blit(statusText, [700 + 127, 0 + 458])
-	surface.blit(timeText, [700 + 110, 0 + 503])
-	surface.blit(stepText, [700 + 135, 0 + 550])
-	surface.blit(pushedText, [700 + 135, 0 + 600])
 
+	if not (mode >= 2 and win == 0):
+		timeText = helpFont.render("{:0.3f} s".format(timeTook), True, GREEN_LIGHT)
+		stepText = helpFont.render(f"{stepNode}", True, GREEN_LIGHT)
+		pushedText = helpFont.render(f"{pushed}", True, GREEN_LIGHT)
+
+		surface.blit(timeText, [700 + 110, 0 + 493])
+		surface.blit(stepText, [700 + 135, 0 + 530])
+		surface.blit(pushedText, [700 + 135, 0 + 570])
+
+
+	
+	
 
 def display_restart():
 	surface.blit(restart_button, [700 + 160, 0 + 410])
 
 def display_visualize():
-	print("asdf")
-	surface.blit(visualize_button, [700 + 135, 0 + 650])
+	# print("asdf")
+	surface.blit(visualize_button, [700 + 135, 0 + 647])
 
 def display_undo():
 	pygame.draw.rect(surface, RED, pygame.Rect(700 + 90, 0 + 410, 50, 40),  0, 20)
@@ -277,26 +288,23 @@ def display_step_3(col = RED, mode = 0):
 	display_title_step_3(color = col)
 	# display_visualize()
 	# print(mode)
-	if mode == 2 or mode == 3:
-		display_visualize()		
-		display_undo()
-		display_redo()
-		display_restart()
-		display_title_content_step_3()
-		display_content_step_3()
-	if mode == 1:
+	if step == 3:
 		display_undo()
 		display_redo()
 		display_restart()
 		display_title_content_step_3()
 		display_content_step_3()
 
+		if mode > 1 and win == 1:
+			display_visualize()
 	
 # status = 0, time = 0, step = 0, pushed = 0
 def draw_menu():
 	pygame.draw.rect(surface, BLUE_LIGHT, [700, 0, 1050, 700])
 
 	display_background()
+	# display_record()
+	# display_visualize()
 	if step == 1:
 		display_step_1(YELLOW, -1)
 		display_step_2(mode = -1)
@@ -306,15 +314,16 @@ def draw_menu():
 		display_step_2(YELLOW, mode = 0)
 		display_step_3()
 	elif step == 3:
+		display_step_1(GREEN_DARK, 0)
+		display_step_2(GREEN_DARK, mode = mode)
 		if win == 0:
-			display_step_1(GREEN_DARK, 0)
-			# print(mode)
-			display_step_2(GREEN_DARK, mode = mode)
 			display_step_3(YELLOW, mode = mode)
-		else:
-			display_step_1(GREEN_DARK, 0)
-			display_step_2(GREEN_DARK, mode = mode)
+		elif win == 1:
 			display_step_3(GREEN_DARK, mode = mode)
+			display_record()
+
+			# If win in mode 2,3 then appear the visualize button
+	# pygame.display.flip()
 # We want to dogde many if else as much as possible because it will cause more errors when coding.
 # -> So we can assume that L,R,U,D as a Point (+-1, 0), (0, +-1)
 
@@ -362,6 +371,9 @@ class Point:
 
 	def __hash__(self):
 		return hash(self.__key())
+
+	def get_point(self):
+		print("(" + str(self.x) + "," + str(self.y) + ")", end = " ")
 	
 class Direction:
 	'''
@@ -451,7 +463,8 @@ class Board:
 	def add_player(self, x, y):
 		self.player = Point(x,y)
 
-
+	def get_history_moves(self):
+		return ", ".join(list(map(lambda move: move.direction.char, self.history_moves)))
 	# Rule for moving in SOKOBAN map, the rules below will apply for 4 directions: UP, DOWN, LEFT, RIGHT
 	# Rule 1: If the forward cell is empty, we literally can move
 	# Rule 2: If the forward cell has a wall, we can not move
@@ -477,17 +490,22 @@ class Board:
 
 
 	# --- We think about this not just for solving a game, we can play it by control the keyboard. So if when we have illegal move, just cost O(logn)
+	def direction_in_available(self, m): # Run bfs with this
+		for i in self.available_moves:
+			if (i.get_char() == m.get_char()):
+				return True
+		return False
 
 	def move(self, direction, redo = False, move = True):
 		
 		# move the player with direction but the argument make sure direction in the available_moves() 
-		if direction in self.available_moves:
+		if (self.direction_in_available(direction)):
 			self.ptr += 1
 			if move == True:
-				if self.ptr < len(self.history_moves) - 1:
+				if self.ptr < len(self.history_moves):
 					# Cut the list
 					self.history_moves = self.history_moves[0:self.ptr]
-				if self.ptr < self.lose:
+				if self.ptr <= self.lose:
 					self.lose = -1 
 			temp = self.player + direction.vector
 			
@@ -523,15 +541,17 @@ class Board:
 
 			self.player = temp
 		self.set_available_moves()
-		print(self.ptr, len(self.history_moves))
-		print("Lose: ",self.lose)
-
+		# print(self.ptr, len(self.history_moves), self.lose)
+		# print("Lose: ",self.lose)
+		# print(self.is_lose())
+		# print("Move: ", direction.char)
 
 	def undo(self):
 		
 		if self.ptr > -1:
 			
 			move = self.history_moves[self.ptr]
+
 			if move.pushed == 1:
 				self.pushed -= 1
 				self.boxes.remove(self.player + move.direction.vector)
@@ -542,17 +562,17 @@ class Board:
 			self.ptr -= 1
 			# self.history_moves.pop()
 		self.set_available_moves()
-		print(self.ptr, len(self.history_moves))
+		# print(self.ptr, len(self.history_moves), self.lose)
+		# print(self.is_lose())
+		# print("Undo: ", move.direction.char)
 
 
 	def redo(self):
-		
 		if self.ptr < len(self.history_moves) - 1:
 			self.move(self.history_moves[self.ptr + 1].direction, redo = True, move = False)
-			# self.ptr += 1
-		print(self.ptr, len(self.history_moves))
+		# print(self.ptr, len(self.history_moves), self.lose)
+		# print(self.is_lose())
 
-	# def dfs(): => In same class or more function ?? 
 	# def a_star():
 	def is_lose(self):
 		if self.lose != -1:
@@ -674,7 +694,7 @@ reset_data()
 # reset_data("./Testcases/Mini Cosmos/6.txt")
 
 def init_data():
-	global move, win, step, timeTook, pushed, startTime, stepNode, map_index, level, board, numsRow, numsCol, numsUnit, lengthSquare, offsetX, offsetY
+	global move, win, step, timeTook, pushed, startTime, stepNode, map_index, level, board, numsRow, numsCol, numsUnit, lengthSquare, offsetX, offsetY, visualized, moves
 	mode = 0
 	win = 0
 	step = 1
@@ -682,7 +702,8 @@ def init_data():
 	pushed = 0
 	startTime = 0
 	stepNode = 0
-
+	visualized = 0
+	moves = []
 	# map_index = 0
 	# level = 0
 	# board = Board()
@@ -716,50 +737,97 @@ def draw_board(board):
 	pygame.display.flip()
 
 
-def print_results(board, dur):
-	print("1. Breadth first search:")
+# Debug
+def print_results(board, gen, rep, expl, memo, dur):
+	print("\n-- Algorithm: Breadth first search --")
 	print("Sequence: ", end="")
 	for ch in board.history_moves:
 		print(ch.direction.char, end=" ")
+	print("\nNode generated: " + str(board.step))
+	print("Node generated: " + str(gen))
+	print("Node repeated: " + str(rep))
+	print("Node explored: " + str(expl))
+	print("Memory: ", str(memo), " MB")  # in megabytes
+	print('Duration: ' + str(dur) + ' secs')
+
+
+def equalSet(child, explored):
+	for ele in explored:
+		if (child.__eq__(ele)):
+			return True
+	return False
+
+
+def print_player(node):
+	node.player.get_point()
+
+
+def print_box(node):
+	for i in node.boxes:
+		i.get_point()
+		print(" ", end='')
+
+
+def print_status(node):
+	for m in node.available_moves:
+		print(m.get_char(), end=" ")
 	print()
-	print(len(board.history_moves))
-	print('Duration: ' + str(dur) + 'secs')
+	print("Position of player: ", end="")
+	print_player(node)
+	print()
+	print("Position of box: ", end="")
+	print_box(node)
+	print()
 
-def bfs(board):
-	# print(test)
-	global win
-	# start = time()
 
-	if (board.is_win()):
-		# end = time()
-		# print_results(board, 1, 0, 0, 0, end-start)
-		return
+def bfs(curr_board):
+	global win, timeTook, startTime
+	startTime = time.time()
+	node_generated = 0
+	node_repeated = 0
+
 	frontier = Queue()
 	explored = set()
-	frontier.put(board)
+	frontier.put(curr_board)
 	stayed_Searching = True
 
+	node_generated += 1
+	i = 0
 	while stayed_Searching:
+		i = i + 1
 		if frontier.empty():
 			print("Solution not found\n")
-			return
+			return []
+
 		node = frontier.get()
 		moves = node.available_moves
 		explored.add(node)
 
+		print("Start loop " + str(i) + " at node: ", end="")
+		print_status(node)
+
 		for m in moves:
 			child = deepcopy(node)
 			child.move(m)
-			if (child not in explored) and child.is_lose == False:
+			if (child not in explored) and child.is_lose() == False:
 				if (child.is_win()):
 					win = 1
-					# end = time()
-					# print_results(child,end-start)
-					# board = deepcopy(child)
+					timeTook = time.time() - startTime
+					process = psutil.Process(os.getpid())
+					memo_info = process.memory_info().rss/(1024*1024) - itemMemory
+
+					print_results(child,node_generated,node_repeated,len(explored), memo_info,timeTook)
+
+					add_history("Breadth First Search", child.get_history_moves(), child.step, node_generated, node_repeated, len(explored), memo_info, timeTook)
 					return child.history_moves
 				frontier.put(child)
-			# end = time()
-			# assert end - start < 300, "Time limit exceeded"
+			else:
+				node_repeated += 1
+			node_generated += 1
+			timeTook = time.time() - startTime
+			# draw_board(board)			
+		print()
+	print(i)
 
 
 mode = 0
@@ -769,19 +837,77 @@ timeTook = 0
 pushed = 0
 startTime = 0
 stepNode = 0
-
 visualized = 0
+moves = []
+# Not init
+proc1 = psutil.Process(os.getpid())
+itemMemory = proc1.memory_info().rss/(1024*1024)
+
+history = 0
+
+
+def line_prepender(filename, algo, sol, ste, gen, rep, expl, memo, dur):
+	if not os.path.exists('Results'):
+		os.mkdir('Results')
+	if not os.path.exists(filename):
+		open(filename, 'w+')
+	with open(filename, 'r+') as f:
+		content = f.read()
+		f.seek(0, 0)
+		dt_string = datetime.now().strftime("%d/%m/%Y %H:%M:%S %p")
+		f.write("Datatime (UTC+7): " + dt_string + '\n')
+		f.write("Problem: " + board.name.split('./')[-1] + '\n')
+		f.write("Algorithm: " + algo + '\n')
+		f.write("Solution: " + sol + '\n')
+		f.write("Step: " + str(ste) + '\n')
+		f.write("Nodes generated: " + str(gen) + '\n')
+		f.write("Nodes repeated: " + str(rep) + '\n')
+		f.write("Nodes explored: " + str(expl) + '\n')
+		f.write("Memory: " + str(memo) + ' MB' + '\n')
+		f.write("Duration: " + str(dur) + " secs" + '\n')
+		f.write("\n\n")
+		f.write("===================================================" + '\n')
+		f.write("===================================================" + '\n')
+		f.write("\n\n")
+		f.write(content)
+
+def add_history(algo, sol, ste, gen, rep, expl, memo, dur):
+	line_prepender('Results/history_log.txt', algo, sol, ste, gen, rep, expl, memo, dur)
+	line_prepender('Results/Solution_{}_test {}'.format(board.name.split('/')[2], board.name.split('/')[3]), algo, sol, ste, gen, rep, expl, memo, dur)
+
 
 def main():
-	global board, level, map_index, step, mode, win, stepNode, timeTook, startTime, pushed
+	global board, level, map_index, step, mode, win, stepNode, timeTook, startTime, pushed, visualized, moves, history
 	while True:
 		clock.tick(FPS)
 		# print(len(board.history_moves))
-		if board.is_win() == True:
+		if board.is_win() == True and mode == 1:
 			win = 1
 			# This result has been recorded in Results folder
-		if win == 0:
+			if history == 0:
+				add_history("Manually", board.get_history_moves(), board.step, 0, 0, 0, 0, timeTook)
+				history = 1
+
+		if step == 3 and win == 0 and mode == 1:
 			timeTook = time.time() - startTime
+
+
+		if step == 3 and mode == 2 and win == 0:
+			moves = bfs(board)
+			# for i in moves:
+			# 	print(i.direction.char, end=" ")
+
+		if len(moves) > 0 and visualized == 1:
+			board.move(moves[0].direction)
+			# print(moves[0].direction.char)
+			moves.pop(0)
+			# print(len(moves))
+			stepNode = board.step
+			pushed = board.pushed
+			# draw_board(board)
+			
+			time.sleep(0.3)
+
 		for event in pygame.event.get():
 			keys_pressed = pygame.key.get_pressed()
 			if event.type == pygame.QUIT or keys_pressed[pygame.K_q]:
@@ -832,11 +958,9 @@ def main():
 						startTime = time.time()
 					if bfs_rect.collidepoint(x,y): 
 						mode = 2
+						# startTime = time.time()
 						step = 3
-						# bfs(board) => Change global win into 1, board = goal_board with new_board
-						# stepNode = board.step
-						# pushed = board.pushed
-						startTime = time.time()
+						continue
 					if A_rect.collidepoint(x,y):
 						mode = 3
 						step = 3
@@ -858,16 +982,15 @@ def main():
 							pushed = board.pushed
 					if mode == 2:
 						#Bfs
-						moves = bfs(board)
+		# Test 4 Mini: U U U U R R L L D D D R R R U U R U U L D D D U U L L L D D D R R D R R U L L L R R U U U L L L D D D L D D R U U U D R R R U U U L L L L D R
+						if restart_rect.collidepoint(x,y):
+							init_data()
+							step = 1
 						if win == 1:
 							if visualized == 0:
 								if visualize_rect.collidepoint(x,y):
-									for move in moves:
-										board.move(move.direction)
+									visualized = 1
 							else:
-								if restart_rect.collidepoint(x,y):
-									init_data()
-									step = 1
 								if undo_rect.collidepoint(x,y):
 									board.undo()
 									stepNode = board.step

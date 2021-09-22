@@ -1,0 +1,16 @@
+Datatime (UTC+7): 22/09/2021 23:16:50 PM
+Problem: Testcases/MINI COSMOS/3.txt
+Algorithm: Breadth First Search
+Solution: R, R, U, U, L, L, L, U, U, R, L, D, D, R, R, R, D, D, L, L, U, D, R, R, U, U, U, R, R, D, D, L, R, U, U, L, U, U, L, L, D, L, L, D, D, R, D, D, R, R, U, U, D, D, L, L, U, U, R, L, L, U, U, R, R, D, R, D, L
+Step: 69
+Nodes generated: 3449
+Nodes repeated: 1862
+Nodes explored: 1015
+Memory: 39.21484375 MB
+Duration: 77.07726192474365 secs
+
+
+===================================================
+===================================================
+
+
