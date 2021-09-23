@@ -587,6 +587,8 @@ class Board:
 		else:
 			return False
 
+	# def set_cost():
+
 	def set_value(self, filename):
 		self.clear_value()
 		self.name = filename
@@ -743,10 +745,10 @@ def print_results(board, gen, rep, expl, memo, dur):
 	print("Sequence: ", end="")
 	for ch in board.history_moves:
 		print(ch.direction.char, end=" ")
-	print("\nNode generated: " + str(board.step))
-	print("Node generated: " + str(gen))
-	print("Node repeated: " + str(rep))
-	print("Node explored: " + str(expl))
+	print("\nNumber of steps: " + str(board.step))
+	print("Nodes generated: " + str(gen))
+	print("Nodes repeated: " + str(rep))
+	print("Nodes explored: " + str(expl))
 	print("Memory: ", str(memo), " MB")  # in megabytes
 	print('Duration: ' + str(dur) + ' secs')
 
@@ -792,6 +794,7 @@ def bfs(curr_board):
 	stayed_Searching = True
 
 	node_generated += 1
+	explored.add(board)
 	i = 0
 	while stayed_Searching:
 		i = i + 1
@@ -801,7 +804,7 @@ def bfs(curr_board):
 
 		node = frontier.get()
 		moves = node.available_moves
-		explored.add(node)
+		# explored.add(node)
 
 		print("Start loop " + str(i) + " at node: ", end="")
 		print_status(node)
@@ -810,6 +813,7 @@ def bfs(curr_board):
 			child = deepcopy(node)
 			child.move(m)
 			if (child not in explored) and child.is_lose() == False:
+				explored.add(child)
 				if (child.is_win()):
 					win = 1
 					timeTook = time.time() - startTime
@@ -859,7 +863,7 @@ def line_prepender(filename, algo, sol, ste, gen, rep, expl, memo, dur):
 		f.write("Problem: " + board.name.split('./')[-1] + '\n')
 		f.write("Algorithm: " + algo + '\n')
 		f.write("Solution: " + sol + '\n')
-		f.write("Step: " + str(ste) + '\n')
+		f.write("Number of steps: " + str(ste) + '\n')
 		f.write("Nodes generated: " + str(gen) + '\n')
 		f.write("Nodes repeated: " + str(rep) + '\n')
 		f.write("Nodes explored: " + str(expl) + '\n')
