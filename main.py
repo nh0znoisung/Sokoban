@@ -6,6 +6,7 @@ import psutil
 from queue import Queue
 from copy import copy, deepcopy
 from datetime import datetime
+import math
 
 successes, failures = pygame.init()
 print("{0} successes and {1} failures".format(successes, failures))
@@ -418,9 +419,46 @@ class Board:
 		self.ptr = -1
 		self.x = -1
 		self.y = -1
-		# self.ptr = 0
 		self.cost = 1e9  # used for heuristic search: A* algorithm
-		# set_available_moves()
+		self.distanceToGoal = dict()
+		self.dead_squares = set()
+
+	def set_cost(self):
+		# Nested dictionary
+		# self.distanceToGoal = dict()
+		for goal in self.goals:
+			self.distanceToGoal[goal] = dict()
+			for path in self.paths:
+				self.distanceToGoal[goal][path] = math.inf
+		queue = Queue()
+		for goal in self.goals:
+			self.distanceToGoal[goal][goal] = 0
+			queue.put(goal)
+			while not queue.empty():
+				position = queue.get()
+				for direction in directions:
+					boxPosition = position + direction.vector
+					playerPosition = position + direction.vector.double()
+					if boxPosition in self.paths:
+						if self.distanceToGoal[goal][boxPosition] == math.inf:
+							if (boxPosition not in self.walls) and (playerPosition not in self.walls):
+								self.distanceToGoal[goal][boxPosition] = self.distanceToGoal[goal][position] + 1
+								queue.put(boxPosition)
+		
+		# if all goals [postions] == math.inf, this position is the dead squares
+		for path in self.paths:
+			ok = 1
+			for goal in self.goals:	
+				if self.distanceToGoal[goal][path] != math.inf:
+					ok = 0
+					break
+			if ok == 1:
+				self.dead_squares.add(path)
+
+		for i in self.dead_squares:
+			i.get_point()
+			print()
+
 
 	def clear_value(self):
 		self.name = ''
@@ -438,6 +476,8 @@ class Board:
 		self.x = -1
 		self.y = -1
 		self.cost = 1e9  # used for heuristic search: A* algorithm
+		self.distanceToGoal = dict()
+		self.dead_squares = set()
 
 	def __eq__(self, other):
 		return self.walls == other.walls and self.goals == other.goals and self.boxes == other.boxes and self.player == other.player
@@ -521,20 +561,21 @@ class Board:
 				# Check True or NotImplemented
 				if self.lose == -1:
 					curr_box = temp + direction.vector
-					checkdir_list = []
-					for direct in directions:
-						if curr_box + direct.vector in self.walls:
-							checkdir_list.append(True)
-						else:
-							checkdir_list.append(False)
-					res = False
-					for i in range(4):
-						if checkdir_list[i] and checkdir_list[(i+1)%4]:
-							res = True
-							break
-					if res:
-						if curr_box not in self.goals:
-							self.lose = self.ptr
+					# checkdir_list = []
+					# for direct in directions:
+					# 	if curr_box + direct.vector in self.walls:
+					# 		checkdir_list.append(True)
+					# 	else:
+					# 		checkdir_list.append(False)
+					# res = False
+					# for i in range(4):
+					# 	if checkdir_list[i] and checkdir_list[(i+1)%4]:
+					# 		res = True
+					# 		break
+					# if res:
+					# 	if curr_box not in self.goals:
+					if curr_box in self.dead_squares:
+						self.lose = self.ptr
 			else:
 				if redo == False:
 					self.history_moves.append(Move(direction, 0))
@@ -587,7 +628,7 @@ class Board:
 		else:
 			return False
 
-	# def set_cost():
+	
 
 	def set_value(self, filename):
 		self.clear_value()
@@ -626,6 +667,7 @@ class Board:
 				y += 1
 			# print(x,y)
 		self.set_available_moves()
+		self.set_cost()
 		return (x,y)
 
 
@@ -723,7 +765,10 @@ def draw_board(board):
 	for point in board.paths:
 		pygame.draw.rect(surface, WHITE, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y, lengthSquare, lengthSquare])
 
-	
+	# Debug dead_squares
+	for point in board.dead_squares:
+		pygame.draw.rect(surface, RED, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y, lengthSquare, lengthSquare])
+
 
 	for point in board.goals:
 		surface.blit(goal, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y])
@@ -733,6 +778,7 @@ def draw_board(board):
 
 	for point in board.boxes:
 		surface.blit(box, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y])
+
 
 	display_title()
 
