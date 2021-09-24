@@ -1,2 +1,5 @@
 pygame
 psutil
+sortedcontainers
+numpy
+scipy

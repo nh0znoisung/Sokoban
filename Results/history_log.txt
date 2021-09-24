@@ -1,3 +1,19 @@
+Datatime (UTC+7): 24/09/2021 19:46:12 PM
+Problem: Testcases/MINI COSMOS/1.txt
+Algorithm: Manually
+Solution: U, U, L, U, U, R, L, D, D, R, R, R, U, R, U, U, L, L, D, D, U, L, L, D, D, R, R, L, D, D, R, R, U, U, L, U, R
+Number of steps: 37
+Nodes generated: 0
+Nodes repeated: 0
+Nodes explored: 0
+Memory: 0 MB
+Duration: 16.443892240524292 secs
+
+
+===================================================
+===================================================
+
+
 Datatime (UTC+7): 22/09/2021 23:16:50 PM
 Problem: Testcases/MINI COSMOS/3.txt
 Algorithm: Breadth First Search
