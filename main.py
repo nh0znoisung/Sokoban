@@ -7,6 +7,7 @@ from queue import Queue
 from copy import copy, deepcopy
 from datetime import datetime
 import math
+from sortedcontainers import SortedList
 
 successes, failures = pygame.init()
 print("{0} successes and {1} failures".format(successes, failures))
@@ -423,7 +424,7 @@ class Board:
 		self.distanceToGoal = dict()
 		self.dead_squares = set()
 
-	def set_cost(self):
+	def set_distance(self):
 		# Nested dictionary
 		# self.distanceToGoal = dict()
 		for goal in self.goals:
@@ -455,9 +456,9 @@ class Board:
 			if ok == 1:
 				self.dead_squares.add(path)
 
-		for i in self.dead_squares:
-			i.get_point()
-			print()
+		# for i in self.dead_squares:
+		# 	i.get_point()
+		# 	print()
 
 
 	def clear_value(self):
@@ -558,22 +559,9 @@ class Board:
 				if redo == False:
 					self.history_moves.append(Move(direction, 1))
 
-				# Check True or NotImplemented
+				# Check lose or not
 				if self.lose == -1:
 					curr_box = temp + direction.vector
-					# checkdir_list = []
-					# for direct in directions:
-					# 	if curr_box + direct.vector in self.walls:
-					# 		checkdir_list.append(True)
-					# 	else:
-					# 		checkdir_list.append(False)
-					# res = False
-					# for i in range(4):
-					# 	if checkdir_list[i] and checkdir_list[(i+1)%4]:
-					# 		res = True
-					# 		break
-					# if res:
-					# 	if curr_box not in self.goals:
 					if curr_box in self.dead_squares:
 						self.lose = self.ptr
 			else:
@@ -667,7 +655,7 @@ class Board:
 				y += 1
 			# print(x,y)
 		self.set_available_moves()
-		self.set_cost()
+		self.set_distance()
 		return (x,y)
 
 
@@ -693,7 +681,8 @@ def reset_data():
 	numsUnit = max(numsCol, numsRow)
 	lengthSquare = int(WIDTH/numsUnit)
 
-	print(numsCol, numsRow, numsUnit) #Debug
+	# #Debug
+	# print(numsCol, numsRow, numsUnit) 
 
 	offsetX = lengthSquare * (numsUnit - numsRow)/2 
 	offsetY = lengthSquare * (numsUnit - numsCol)/2 
@@ -748,10 +737,7 @@ def init_data():
 	stepNode = 0
 	visualized = 0
 	moves = []
-	# map_index = 0
-	# level = 0
-	# board = Board()
-	# 
+
 	board.clear_value()
 	reset_data()
 
@@ -765,9 +751,9 @@ def draw_board(board):
 	for point in board.paths:
 		pygame.draw.rect(surface, WHITE, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y, lengthSquare, lengthSquare])
 
-	# Debug dead_squares
-	for point in board.dead_squares:
-		pygame.draw.rect(surface, RED, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y, lengthSquare, lengthSquare])
+	# # Debug dead_squares
+	# for point in board.dead_squares:
+	# 	pygame.draw.rect(surface, RED, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y, lengthSquare, lengthSquare])
 
 
 	for point in board.goals:
@@ -787,7 +773,10 @@ def draw_board(board):
 
 # Debug
 def print_results(board, gen, rep, expl, memo, dur):
-	print("\n-- Algorithm: Breadth first search --")
+	if step == 2:
+		print("\n-- Algorithm: Breadth first search --")
+	elif step == 3:
+		print("\n-- Algorithm: A star --")
 	print("Sequence: ", end="")
 	for ch in board.history_moves:
 		print(ch.direction.char, end=" ")
@@ -880,6 +869,59 @@ def bfs(curr_board):
 	print(i)
 
 
+def A_star(curr_board):
+	global win, timeTook, startTime
+	startTime = time.time()
+	node_generated = 0
+	node_repeated = 0
+
+	frontier = SortedList(key=lambda board: board.cost)
+	explored = set()
+	frontier.add(curr_board)
+	stayed_Searching = True
+
+	node_generated += 1
+	explored.add(board)
+	i = 0
+	while stayed_Searching:
+		i = i + 1
+		if len(frontier) == 0:
+			print("Solution not found\n")
+			return []
+
+		node = frontier.pop()
+		moves = node.available_moves
+		# explored.add(node)
+
+		print("Start loop " + str(i) + " at node: ", end="")
+		print_status(node)
+
+		for m in moves:
+			child = deepcopy(node)
+			child.move(m)
+			if (child not in explored) and child.is_lose() == False:
+				explored.add(child)
+				if (child.is_win()):
+					win = 1
+					timeTook = time.time() - startTime
+					process = psutil.Process(os.getpid())
+					memo_info = process.memory_info().rss/(1024*1024) - itemMemory
+
+					print_results(child,node_generated,node_repeated,len(explored), memo_info,timeTook)
+
+					add_history("Breadth First Search", child.get_history_moves(), child.step, node_generated, node_repeated, len(explored), memo_info, timeTook)
+					return child.history_moves
+				frontier.add(child)
+			else:
+				node_repeated += 1
+			node_generated += 1
+			timeTook = time.time() - startTime
+			# draw_board(board)			
+		print()
+	print(i)
+
+
+
 mode = 0
 win = 0
 step = 1
@@ -944,8 +986,9 @@ def main():
 
 		if step == 3 and mode == 2 and win == 0:
 			moves = bfs(board)
-			# for i in moves:
-			# 	print(i.direction.char, end=" ")
+
+		if step == 3 and mode == 3 and win == 0:
+			moves = A_star(board)
 
 		if len(moves) > 0 and visualized == 1:
 			board.move(moves[0].direction)
@@ -1050,9 +1093,23 @@ def main():
 									stepNode = board.step
 									pushed = board.pushed
 					if mode == 3:
-						continue
-					if mode > 1:
-						continue
+						if restart_rect.collidepoint(x,y):
+							init_data()
+							step = 1
+						if win == 1:
+							if visualized == 0:
+								if visualize_rect.collidepoint(x,y):
+									visualized = 1
+							else:
+								if undo_rect.collidepoint(x,y):
+									board.undo()
+									stepNode = board.step
+									pushed = board.pushed	
+								if redo_rect.collidepoint(x,y):
+									board.redo()
+									stepNode = board.step
+									pushed = board.pushed
+
 
 		draw_board(board)
 		pygame.display.update()
