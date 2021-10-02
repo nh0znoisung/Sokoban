@@ -356,7 +356,7 @@ def bfs(curr_board):
 	while stayed_Searching:
 		i = i + 1
 		if time.time() - startTime > 600:
-			return ([], 0, 0)
+			return ([], 0, 0, 0)
 		node = frontier.get()
 		moves = node.available_moves
 
@@ -368,7 +368,7 @@ def bfs(curr_board):
 				if (child.is_win()):
 					process = psutil.Process(os.getpid())
 					memo_info = process.memory_info().rss/(1024*1024) - itemMemory
-					return (child.history_moves, time.time() - startTime, memo_info)
+					return (child.history_moves, len(child.history_moves), time.time() - startTime, memo_info)
 				frontier.put(child)
 			else:
 				node_repeated += 1
@@ -392,7 +392,7 @@ def A_star(curr_board):
 	while stayed_Searching:
 		i = i + 1
 		if time.time() - startTime > 600:
-			return ([], 0, 0)
+			return ([], 0, 0, 0)
 
 		node = frontier.pop(0)
 		moves = node.available_moves
@@ -405,21 +405,18 @@ def A_star(curr_board):
 				if (child.is_win()):
 					process = psutil.Process(os.getpid())
 					memo_info = process.memory_info().rss/(1024*1024) - itemMemory
-					return (child.history_moves, time.time() - startTime, memo_info)
+					return (child.history_moves, len(child.history_moves), time.time() - startTime, memo_info)
 				frontier.add(child)
 			else:
 				node_repeated += 1
 			node_generated += 1
 
 
-# Convert to csv. 
-
-# 0: BFS, 1: A_star
 def main_BFS():
 	i = -1
 	if not os.path.exists("BFS.csv"):
 		f = open("BFS.csv", 'w+')
-		f.write("Map,Level,Algorithm,Status,Time (s),Memory (MB)\n")
+		f.write("Map,Level,Algorithm,Status,Step,Time (s),Memory (MB)\n")
 		f.close()
 		i = 0
 	else:
@@ -434,15 +431,15 @@ def main_BFS():
 	for j in range(i, 80):
 		board.set_value("./Testcases/{}/{}.txt".format(map_list[int(j/40)], j%40+1))
 		print("\nSolving testcase {}: ".format(j+1))
-		(moves, time, memo) = bfs(board)
+		(moves, step, time, memo) = bfs(board)
 		
 		f = open("BFS.csv", 'a+')
 		if len(moves) == 0:
-			f.write("{},{},BFS,Time Limit Exceeded,???,??? \n".format(map_list[int(j/40)], j%40+1, time, memo))
-			print("Results testcase {}. Time Limit Exceeded.".format(j+1, time, memo))
+			f.write("{},{},BFS,Time Limit Exceeded,???,???,??? \n".format(map_list[int(j/40)], j%40+1))
+			print("Results testcase {}. Time Limit Exceeded.".format(j+1))
 		else:
-			f.write("{},{},BFS,Completed,{:0.3f},{:0.3f}\n".format(map_list[int(j/40)], j%40+1, time, memo))
-			print("Results testcase {}. Completed, Time: {:0.3f} s, Memory: {:0.3f} MB\n".format(j+1, time, memo))
+			f.write("{},{},BFS,Completed,{},{:0.3f},{:0.3f}\n".format(map_list[int(j/40)], j%40+1, step, time, memo))
+			print("Results testcase {}. Completed, Step: {}, Time: {:0.3f} s, Memory: {:0.3f} MB\n".format(j+1, step, time, memo))
 		f.close()
 
 	print("\nSolving BFS algorithm results Completed")
@@ -452,7 +449,7 @@ def main_Astar():
 	i = -1
 	if not os.path.exists("A_star.csv"):
 		f = open("A_star.csv", 'w+')
-		f.write("Map,Level,Algorithm,Status,Time (s),Memory (MB)\n")
+		f.write("Map,Level,Algorithm,Status,Step,Time (s),Memory (MB)\n")
 		f.close()
 		i = 0
 	else:
@@ -467,15 +464,15 @@ def main_Astar():
 	for j in range(i, 80):
 		board.set_value("./Testcases/{}/{}.txt".format(map_list[int(j/40)], j%40+1))
 		print("\nSolving testcase {}: ".format(j+1))
-		(moves, time, memo) = A_star(board)
+		(moves, step, time, memo) = A_star(board)
 		
 		f = open("A_star.csv", 'a+')
 		if len(moves) == 0:
-			f.write("{},{},A_star,Time Limit Exceeded,???,??? \n".format(map_list[int(j/40)], j%40+1, time, memo))
-			print("Results testcase {}. Time Limit Exceeded.".format(j+1, time, memo))
+			f.write("{},{},A_star,Time Limit Exceeded,???,???,??? \n".format(map_list[int(j/40)], j%40+1))
+			print("Results testcase {}. Time Limit Exceeded.".format(j+1))
 		else:
-			f.write("{},{},A_star,Completed,{:0.3f},{:0.3f}\n".format(map_list[int(j/40)], j%40+1, time, memo))
-			print("Results testcase {}. Completed, Time: {:0.3f} s, Memory: {:0.3f} MB\n".format(j+1, time, memo))
+			f.write("{},{},A_star,Completed,{},{:0.3f},{:0.3f}\n".format(map_list[int(j/40)], j%40+1, step, time, memo))
+			print("Results testcase {}. Completed, Step: {}, Time: {:0.3f} s, Memory: {:0.3f} MB\n".format(j+1, step, time, memo))
 		f.close()
 
 	print("\nSolving A-star algorithm results Completed")
