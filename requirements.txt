@@ -3,3 +3,4 @@ psutil
 sortedcontainers
 numpy
 scipy
+pandas
