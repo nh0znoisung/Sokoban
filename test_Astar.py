@@ -357,6 +357,9 @@ def bfs(curr_board):
 		i = i + 1
 		if time.time() - startTime > 600:
 			return ([], 0, 0, 0)
+		if frontier.empty():
+			print("Solution not found\n")
+			return []
 		node = frontier.get()
 		moves = node.available_moves
 
@@ -393,7 +396,9 @@ def A_star(curr_board):
 		i = i + 1
 		if time.time() - startTime > 600:
 			return ([], 0, 0, 0)
-
+		if len(frontier) == 0:
+			print("Solution not found\n")
+			return []
 		node = frontier.pop(0)
 		moves = node.available_moves
 
