@@ -1,0 +1,16 @@
+Datatime (UTC+7): 23/09/2021 17:06:54 PM
+Problem: Testcases/MINI COSMOS/39.txt
+Algorithm: Breadth First Search
+Solution: D, D, R, R, U, U, U, D, D, D, L, L, U, U, R, L, U, U, R, U, R, R, D, L, D, D, L, L, U, U, R, U, R, D, L, L, D, D, D, D, R, R, R, R, U, U, L, L, L, R, R, R, D, D, L, L, L, L, U, U, R, R, D, U, R, R, D, D, L, L, L, D, L, U, R, R, U, U, L, L, U, L, U, R, R, U, R, R, D, L, D, D, L, L, U, U, R, U, R, D
+Number of steps: 100
+Nodes generated: 11211
+Nodes repeated: 6382
+Nodes explored: 4830
+Memory: 223.0 MB
+Duration: 479.42783403396606 secs
+
+
+===================================================
+===================================================
+
+
