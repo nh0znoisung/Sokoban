@@ -1,5 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
+# import matplotlib.pyplot as plt
 import pandas as pd
 
 
@@ -52,3 +53,4 @@ plt.xticks([barWidth/2 + r for r in range(len(stepBFS))],index)
 plt.title("The amount of memory used in MICRO COSMOS Testcases")
 plt.legend()
 plt.show()
+plt.savefig('books_read.png')

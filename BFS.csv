@@ -1,9 +1,9 @@
 Map,Level,Algorithm,Status,Step,Time (s),Memory (MB)
-MINI COSMOS,1,BFS,Completed,37,0.880,5.152
+MINI COSMOS,1,BFS,Completed,37,0.88,5.152
 MINI COSMOS,2,BFS,Completed,60,8.436,25.266
-MINI COSMOS,3,BFS,Completed,69,21.440,43.746
+MINI COSMOS,3,BFS,Completed,69,21.44,43.746
 MINI COSMOS,4,BFS,Completed,71,3.308,16.562
-MINI COSMOS,5,BFS,Completed,104,100.669,104.000
+MINI COSMOS,5,BFS,Completed,104,100.669,104
 MINI COSMOS,6,BFS,Time Limit Exceeded,???,???,??? 
 MINI COSMOS,7,BFS,Completed,61,61.414,64.344
 MINI COSMOS,8,BFS,Completed,93,541.425,245.996
@@ -13,7 +13,7 @@ MINI COSMOS,11,BFS,Completed,74,83.193,75.941
 MINI COSMOS,12,BFS,Time Limit Exceeded,???,???,??? 
 MINI COSMOS,13,BFS,Time Limit Exceeded,???,???,??? 
 MINI COSMOS,14,BFS,Time Limit Exceeded,???,???,??? 
-MINI COSMOS,15,BFS,Completed,82,85.741,58.980
+MINI COSMOS,15,BFS,Completed,82,85.741,58.98
 MINI COSMOS,16,BFS,Time Limit Exceeded,???,???,??? 
 MINI COSMOS,17,BFS,Completed,65,40.677,44.141
 MINI COSMOS,18,BFS,Completed,110,327.115,176.391
@@ -30,7 +30,7 @@ MINI COSMOS,28,BFS,Time Limit Exceeded,???,???,???
 MINI COSMOS,29,BFS,Completed,58,66.835,47.934
 MINI COSMOS,30,BFS,Time Limit Exceeded,???,???,??? 
 MINI COSMOS,31,BFS,Completed,74,5.299,3.523
-MINI COSMOS,32,BFS,Completed,91,5.333,1.051
+MINI COSMOS,32,BFS,Completed,91,5.333,15.051
 MINI COSMOS,33,BFS,Completed,94,119.352,108.891
 MINI COSMOS,34,BFS,Completed,101,190.001,150.047
 MINI COSMOS,35,BFS,Completed,88,11.425,6.312
@@ -45,7 +45,7 @@ MICRO COSMOS,3,BFS,Time Limit Exceeded,???,???,???
 MICRO COSMOS,4,BFS,Time Limit Exceeded,???,???,??? 
 MICRO COSMOS,5,BFS,Time Limit Exceeded,???,???,??? 
 MICRO COSMOS,6,BFS,Time Limit Exceeded,???,???,??? 
-MICRO COSMOS,7,BFS,Completed,110,229.675,181.680
+MICRO COSMOS,7,BFS,Completed,110,282.284,182.164
 MICRO COSMOS,8,BFS,Time Limit Exceeded,???,???,??? 
 MICRO COSMOS,9,BFS,Time Limit Exceeded,???,???,??? 
 MICRO COSMOS,10,BFS,Time Limit Exceeded,???,???,??? 
@@ -67,7 +67,7 @@ MICRO COSMOS,25,BFS,Time Limit Exceeded,???,???,???
 MICRO COSMOS,26,BFS,Time Limit Exceeded,???,???,??? 
 MICRO COSMOS,27,BFS,Time Limit Exceeded,???,???,??? 
 MICRO COSMOS,28,BFS,Completed,73,39.424,25.711
-MICRO COSMOS,29,BFS,Completed,83,92.910,67.016
+MICRO COSMOS,29,BFS,Completed,83,92.91,67.016
 MICRO COSMOS,30,BFS,Time Limit Exceeded,???,???,??? 
 MICRO COSMOS,31,BFS,Completed,101,469.546,221.066
 MICRO COSMOS,32,BFS,Time Limit Exceeded,???,???,??? 

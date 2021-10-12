@@ -4,3 +4,4 @@ sortedcontainers
 numpy
 scipy
 pandas
+matplotlib
