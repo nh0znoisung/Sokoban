@@ -16,7 +16,7 @@
 ## Usage
 Clone our source code
 ```sh
-$ git clone https://github.com/nh0znoisung/AI_intro_Assignment_1.git
+$ git clone https://github.com/nh0znoisung/Sokoban
 $ cd AI_intro_Assignment_1
 ```
 
@@ -31,3 +31,4 @@ Run program
 ```sh
 $ python main.py
 ```
+
