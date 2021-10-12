@@ -17,7 +17,7 @@
 Clone our source code
 ```sh
 $ git clone https://github.com/nh0znoisung/Sokoban
-$ cd AI_intro_Assignment_1
+$ cd Sokoban
 ```
 
 Install Dependencies
