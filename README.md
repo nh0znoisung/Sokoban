@@ -1,7 +1,7 @@
-# AI_intro_Assignment_1
-Introduction to AI - Assignment 1
+# Sokoban
+**Assignment 1 - Introduction to Artificial Intelligence**
+**Quach Minh Tuan - To Thanh Phong - Vo Anh Nguyen**
 
-## Overleaf: [link](https://www.overleaf.com/project/6137836746fe4c7899f8ae14)
 
 ## Usage
 Clone our source code
