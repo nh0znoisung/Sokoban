@@ -2,7 +2,8 @@
 **Assignment 1 - Introduction to Artificial Intelligence**
 
 
-Authors: **Quach Minh Tuan - To Thanh Phong - Vo Anh Nguyen**
+## Authors 
+**Quach Minh Tuan - To Thanh Phong - Vo Anh Nguyen**
 
 ## Version
 1.0.0
