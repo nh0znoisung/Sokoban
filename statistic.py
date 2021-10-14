@@ -81,9 +81,13 @@ def drawChart(factor,map):
 	plt.savefig("./Charts/" + save + "_" + map + ".png")	
 
 
-drawChart("Step","MINI COSMOS")
-drawChart("Step","MICRO COSMOS")
-drawChart("Time (s)", "MINI COSMOS")
-drawChart("Time (s)", "MICRO COSMOS")
-drawChart("Memory (MB)","MINI COSMOS")
-drawChart("Memory (MB)","MICRO COSMOS")
+#drawChart("Step","MINI COSMOS")
+#drawChart("Step","MICRO COSMOS")
+#drawChart("Time (s)", "MINI COSMOS")
+#drawChart("Time (s)", "MICRO COSMOS")
+#drawChart("Memory (MB)","MINI COSMOS")
+#drawChart("Memory (MB)","MICRO COSMOS")
+
+print(BFS)
+print(BFS["Step"].count())
+print(BFS["Status"].count("Completed"))

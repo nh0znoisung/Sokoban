@@ -1,4 +1,4 @@
-import time
+
 import os
 import psutil
 from queue import Queue
@@ -9,7 +9,6 @@ from sortedcontainers import SortedList
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 import pandas as pd
-
 
 class Point:
 	'''
@@ -83,6 +82,8 @@ class Board:
 	# Use set() DataStructure for saving wall, goal, box, player
 	# set() in Python is implemented as hashmap with finding and adding or deleting operator just cost time complexity O(1), in worst-case it still cost O(n) since hashing collision
 	# set() is the same as 2d-array in time and space complexity, but it's convenient that it's support function such as union(), issubset(),..
+
+
 	def __init__(self):
 		self.name = ''
 		self.history_moves = [] # List of tuple Move()
@@ -122,7 +123,7 @@ class Board:
 		self.dead_squares = set()
 
 	def __eq__(self, other):
-		return self.walls == other.walls and self.goals == other.goals and self.boxes == other.boxes and self.player == other.player
+		return self.boxes == other.boxes and self.player == other.player
 
 	def __key(self):
 		return (self.name)
@@ -202,12 +203,13 @@ class Board:
 					curr_box = temp + direction.vector
 					if curr_box in self.dead_squares:
 						self.lose = self.ptr
+				#self.minimum_cost()
 			else:
 				if redo == False:
 					self.history_moves.append(Move(direction, 0))
 			self.player = temp
 		self.set_available_moves()
-		self.minimum_cost()
+		
 
 	def undo(self):
 		if self.ptr > -1:
@@ -221,7 +223,7 @@ class Board:
 			self.step -= 1
 			self.ptr -= 1
 		self.set_available_moves()
-		self.minimum_cost()
+		#self.minimum_cost()
 
 	def redo(self):
 		if self.ptr < len(self.history_moves) - 1:
@@ -267,7 +269,7 @@ class Board:
 					break
 			if ok == 1:
 				self.dead_squares.add(path)
-
+	"""
 	def minimum_cost(self):
 		# Minimum of matching all distances from all goals to all boxes (Assignment Problem) using Hungarian Algorithm
 		temp = []
@@ -287,7 +289,7 @@ class Board:
 		cost = arr.reshape(len(self.goals), len(self.boxes))
 		row_ind, col_ind = linear_sum_assignment(cost) # Hungarian Algorithm
 		self.cost = cost[row_ind, col_ind].sum() + len(self.history_moves) # f(n) = g(n) + h(n)
-
+	"""
 	def set_value(self, filename):
 		self.clear_value()
 		self.name = filename
@@ -324,7 +326,7 @@ class Board:
 				y += 1
 		self.set_available_moves()
 		self.set_distance()
-		self.minimum_cost()
+		#self.minimum_cost()
 		return (x,y)
 
 
