@@ -531,7 +531,7 @@ class Board:
 		self.dead_squares = set()
 
 	def __eq__(self, other):
-		return self.walls == other.walls and self.goals == other.goals and self.boxes == other.boxes and self.player == other.player
+		return self.boxes == other.boxes and self.player == other.player
 
 	def __key(self):
 		return (self.name)
