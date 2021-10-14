@@ -1,13 +1,23 @@
-# AI_intro_Assignment_1
-Introduction to AI - Assignment 1
+# Sokoban game
+**Assignment 1 - Introduction to Artificial Intelligence**
 
-## Overleaf: [link](https://www.overleaf.com/project/6137836746fe4c7899f8ae14)
+
+## Authors 
+**Quach Minh Tuan - To Thanh Phong - Vo Anh Nguyen**
+
+## Version
+1.0.0
+
+## Requirements
++ `Python` >= 3.9.7
++ `Pip` >= 21.2.3
+  
 
 ## Usage
 Clone our source code
 ```sh
-$ git clone https://github.com/nh0znoisung/AI_intro_Assignment_1.git
-$ cd AI_intro_Assignment_1
+$ git clone https://github.com/nh0znoisung/Sokoban
+$ cd Sokoban
 ```
 
 Install Dependencies
@@ -21,3 +31,4 @@ Run program
 ```sh
 $ python main.py
 ```
+
