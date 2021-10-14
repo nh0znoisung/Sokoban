@@ -1,4 +1,4 @@
-
+import time
 import os
 import psutil
 from queue import Queue
@@ -82,12 +82,8 @@ class Board:
 	# Use set() DataStructure for saving wall, goal, box, player
 	# set() in Python is implemented as hashmap with finding and adding or deleting operator just cost time complexity O(1), in worst-case it still cost O(n) since hashing collision
 	# set() is the same as 2d-array in time and space complexity, but it's convenient that it's support function such as union(), issubset(),..
-
-
 	def __init__(self):
 		self.name = ''
-		self.history_moves = [] # List of tuple Move()
-		self.available_moves = []
 		self.walls = set() # set of Point()
 		self.goals = set()
 		self.boxes = set()
@@ -95,18 +91,11 @@ class Board:
 		self.lose = -1
 		self.player = None
 		self.step = 0
-		self.pushed = 0
-		self.ptr = -1
-		self.x = -1
-		self.y = -1
-		self.cost = 1e9  # used for heuristic search: A* algorithm
 		self.distanceToGoal = dict() # Nested dictionary
 		self.dead_squares = set()
 
 	def clear_value(self):
 		self.name = ''
-		self.history_moves = []
-		self.available_moves = []
 		self.walls = set()
 		self.goals = set()
 		self.boxes = set()
@@ -114,16 +103,11 @@ class Board:
 		self.lose = -1
 		self.player = None
 		self.step = 0
-		self.pushed = 0
-		self.ptr = -1
-		self.x = -1
-		self.y = -1
-		self.cost = 1e9
 		self.distanceToGoal = dict()
 		self.dead_squares = set()
 
 	def __eq__(self, other):
-		return self.boxes == other.boxes and self.player == other.player
+		return self.boxes.issubset(other.boxes) and self.player == other.player
 
 	def __key(self):
 		return (self.name)
@@ -131,23 +115,8 @@ class Board:
 	def __hash__(self):
 		return hash(self.__key())
 
-	def add_wall(self, x, y):
-		self.walls.add(Point(x,y))
 
-	def add_goal(self, x, y):
-		self.goals.add(Point(x,y))
 
-	def add_box(self, x, y):
-		self.boxes.add(Point(x,y))
-
-	def add_path(self, x, y):
-		self.paths.add(Point(x,y))
-
-	def add_player(self, x, y):
-		self.player = Point(x,y)
-
-	def get_history_moves(self):
-		return ", ".join(list(map(lambda move: move.direction.char, self.history_moves)))
 
 	#$$ Rule for moving in SOKOBAN map, the rules below will apply for 4 directions: UP, DOWN, LEFT, RIGHT
 	# Rule 1: If the forward cell is empty, we literally can move
@@ -159,87 +128,36 @@ class Board:
 	def set_available_moves(self): 
 		# Setup attribute available_moves as a list storing legal moves up to date which is a subset of directions list (<= 4 elements)
 		# Available moves <=> Rule 1 + Rule 3.2
-		self.available_moves = []
+		available_moves = set()
 		for direction in directions:
 			if self.player + direction.vector not in self.walls:
 				# forward cell can be a box or empty
 				if self.player + direction.vector in self.boxes:
 					# forward cell contains a box
-					if self.player + direction.vector.double() not in self.walls.union(self.boxes):
-						self.available_moves.append(direction)
+					if (self.player + direction.vector.double() not in self.walls) and (self.player + direction.vector.double() not in self.boxes):
+						available_moves.add(direction)
 				else:
 					# forward cell is empty
-					self.available_moves.append(direction)
-
-	def direction_in_available(self, m):
-		for i in self.available_moves:
-			if (i.get_char() == m.get_char()):
-				return True
-		return False
+					available_moves.add(direction)
+		return available_moves
 
 	# Move the player with direction but the argument make sure direction in the available_moves 
-	def move(self, direction, redo = False, move = True):	
-		if (self.direction_in_available(direction)):
-			self.ptr += 1
-			if move == True:
-				if self.ptr < len(self.history_moves):
-					# Cut the list
-					self.history_moves = self.history_moves[0:self.ptr]
-				if self.ptr <= self.lose:
-					self.lose = -1 
-			temp = self.player + direction.vector
+	def move(self, direction):	
+		temp = self.player + direction.vector
+		self.step += 1
+		if temp in self.boxes:
+			self.boxes.remove(temp)
+			self.boxes.add(temp + direction.vector)
 			
-			self.step += 1
-			if temp in self.boxes:
-				# We push the box forward, so we need to remove the current position and add the forward position
-				self.pushed += 1
-				self.boxes.remove(temp)
-				self.boxes.add(temp + direction.vector)
-				if redo == False:
-					self.history_moves.append(Move(direction, 1))
-
-				# Check lose or not
-				if self.lose == -1:
-					curr_box = temp + direction.vector
-					if curr_box in self.dead_squares:
-						self.lose = self.ptr
-				#self.minimum_cost()
-			else:
-				if redo == False:
-					self.history_moves.append(Move(direction, 0))
-			self.player = temp
-		self.set_available_moves()
+			if self.lose == -1:
+				if (temp + direction.vector) in self.dead_squares:
+					self.lose = 0
+		
+		self.player = temp
 		
 
-	def undo(self):
-		if self.ptr > -1:
-			move = self.history_moves[self.ptr]
-			if move.pushed == 1:
-				self.pushed -= 1
-				self.boxes.remove(self.player + move.direction.vector)
-				self.boxes.add(self.player)
-
-			self.player = self.player - move.direction.vector
-			self.step -= 1
-			self.ptr -= 1
-		self.set_available_moves()
-		#self.minimum_cost()
-
-	def redo(self):
-		if self.ptr < len(self.history_moves) - 1:
-			self.move(self.history_moves[self.ptr + 1].direction, redo = True, move = False)
-
-	def is_lose(self):
-		if self.lose != -1:
-			if self.ptr >= self.lose:
-				return True
-		return False
-
 	def is_win(self):
-		if self.goals.issubset(self.boxes):
-			return True
-		else:
-			return False
+		return self.goals.issubset(self.boxes)
 
 	def set_distance(self):
 		for goal in self.goals:
@@ -269,7 +187,7 @@ class Board:
 					break
 			if ok == 1:
 				self.dead_squares.add(path)
-	"""
+	
 	def minimum_cost(self):
 		# Minimum of matching all distances from all goals to all boxes (Assignment Problem) using Hungarian Algorithm
 		temp = []
@@ -288,8 +206,23 @@ class Board:
 		# Make matrix with row is goal and colum is box
 		cost = arr.reshape(len(self.goals), len(self.boxes))
 		row_ind, col_ind = linear_sum_assignment(cost) # Hungarian Algorithm
-		self.cost = cost[row_ind, col_ind].sum() + len(self.history_moves) # f(n) = g(n) + h(n)
-	"""
+		return cost[row_ind, col_ind].sum() + self.step # f(n) = g(n) + h(n)
+
+	def add_wall(self, x, y):
+		self.walls.add(Point(x,y))
+
+	def add_goal(self, x, y):
+		self.goals.add(Point(x,y))
+
+	def add_box(self, x, y):
+		self.boxes.add(Point(x,y))
+
+	def add_path(self, x, y):
+		self.paths.add(Point(x,y))
+
+	def add_player(self, x, y):
+		self.player = Point(x,y)
+
 	def set_value(self, filename):
 		self.clear_value()
 		self.name = filename
@@ -324,23 +257,19 @@ class Board:
 						self.add_path(x,y)
 					x += 1
 				y += 1
-		self.set_available_moves()
 		self.set_distance()
-		#self.minimum_cost()
 		return (x,y)
 
 
 board = Board()
 
 map_list = ['MINI COSMOS', 'MICRO COSMOS']
-# map_index = 0
-# level = 0
-# board.set_value("./Testcases/{}/{}.txt".format(map_list[map_index], level+1))
-
 proc1 = psutil.Process(os.getpid())
 itemMemory = proc1.memory_info().rss/(1024*1024)
 
-
+def board_move(curr_board, direction):
+	curr_board.move(direction)
+	return curr_board
 
 def bfs(curr_board):
 	startTime = time.time()
@@ -353,27 +282,28 @@ def bfs(curr_board):
 	stayed_Searching = True
 
 	node_generated += 1
-	explored.add(board)
+	explored.add(curr_board)
 	i = 0
 	while stayed_Searching:
 		i = i + 1
 		if time.time() - startTime > 600:
-			return ([], 0, 0, 0)
+			return (0, 0, 0)
 		if frontier.empty():
 			print("Solution not found\n")
-			return []
+			return (0, 0, 0)
 		node = frontier.get()
-		moves = node.available_moves
+		moves = node.set_available_moves()
 
 		for m in moves:
 			child = deepcopy(node)
 			child.move(m)
-			if (child not in explored) and child.is_lose() == False:
+			if (child not in explored) and child.lose == -1:
 				explored.add(child)
 				if (child.is_win()):
+					end = time.time() - startTime
 					process = psutil.Process(os.getpid())
 					memo_info = process.memory_info().rss/(1024*1024) - itemMemory
-					return (child.history_moves, len(child.history_moves), time.time() - startTime, memo_info)
+					return (child.step, end, memo_info)
 				frontier.put(child)
 			else:
 				node_repeated += 1
@@ -386,7 +316,7 @@ def A_star(curr_board):
 	node_generated = 0
 	node_repeated = 0
 
-	frontier = SortedList(key=lambda board: board.cost)
+	frontier = SortedList(key=lambda board: board.minimum_cost())
 	explored = set()
 	frontier.add(curr_board)
 	stayed_Searching = True
@@ -397,22 +327,23 @@ def A_star(curr_board):
 	while stayed_Searching:
 		i = i + 1
 		if time.time() - startTime > 600:
-			return ([], 0, 0, 0)
+			return (0, 0, 0)
 		if len(frontier) == 0:
 			print("Solution not found\n")
-			return []
+			return (0, 0, 0)
 		node = frontier.pop(0)
-		moves = node.available_moves
+		moves = node.set_available_moves()
 
 		for m in moves:
 			child = deepcopy(node)
 			child.move(m)
-			if (child not in explored) and child.is_lose() == False:
+			if (child not in explored) and child.lose == -1:
 				explored.add(child)
 				if (child.is_win()):
+					end = time.time() - startTime
 					process = psutil.Process(os.getpid())
 					memo_info = process.memory_info().rss/(1024*1024) - itemMemory
-					return (child.history_moves, len(child.history_moves), time.time() - startTime, memo_info)
+					return (child.step, end, memo_info)
 				frontier.add(child)
 			else:
 				node_repeated += 1
@@ -438,10 +369,10 @@ def main_BFS():
 	for j in range(i, 80):
 		board.set_value("./Testcases/{}/{}.txt".format(map_list[int(j/40)], j%40+1))
 		print("\nSolving testcase {}: ".format(j+1))
-		(moves, step, time, memo) = bfs(board)
+		(step, time, memo) = bfs(board)
 		
 		f = open("BFS.csv", 'a+')
-		if len(moves) == 0:
+		if step == 0:
 			f.write("{},{},BFS,Time Limit Exceeded,???,???,??? \n".format(map_list[int(j/40)], j%40+1))
 			print("Results testcase {}. Time Limit Exceeded.".format(j+1))
 		else:
@@ -471,10 +402,10 @@ def main_Astar():
 	for j in range(i, 80):
 		board.set_value("./Testcases/{}/{}.txt".format(map_list[int(j/40)], j%40+1))
 		print("\nSolving testcase {}: ".format(j+1))
-		(moves, step, time, memo) = A_star(board)
+		(step, time, memo) = A_star(board)
 		
 		f = open("A_star.csv", 'a+')
-		if len(moves) == 0:
+		if step == 0:
 			f.write("{},{},A_star,Time Limit Exceeded,???,???,??? \n".format(map_list[int(j/40)], j%40+1))
 			print("Results testcase {}. Time Limit Exceeded.".format(j+1))
 		else:
