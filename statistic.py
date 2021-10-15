@@ -12,8 +12,8 @@ def drawChart(factor,map):
 	stepBFS = []
 	stepAstar = []
 	if (map == "MINI COSMOS"):
-		stepBFS = BFS[factor][1:40]
-		stepAstar = BFS[factor][1:40]
+		stepBFS = BFS[factor][1:41]
+		stepAstar = BFS[factor][1:41]
 	else:
 		stepBFS = BFS[factor][40:len(BFS)]
 		stepAstar = BFS[factor][40:len(BFS)]
@@ -81,13 +81,15 @@ def drawChart(factor,map):
 	plt.savefig("./Charts/" + save + "_" + map + ".png")	
 
 
-#drawChart("Step","MINI COSMOS")
-#drawChart("Step","MICRO COSMOS")
-#drawChart("Time (s)", "MINI COSMOS")
-#drawChart("Time (s)", "MICRO COSMOS")
-#drawChart("Memory (MB)","MINI COSMOS")
-#drawChart("Memory (MB)","MICRO COSMOS")
+drawChart("Step","MINI COSMOS")
+drawChart("Step","MICRO COSMOS")
+drawChart("Time (s)", "MINI COSMOS")
+drawChart("Time (s)", "MICRO COSMOS")
+drawChart("Memory (MB)","MINI COSMOS")
+drawChart("Memory (MB)","MICRO COSMOS")
 
-print(BFS)
-print(BFS["Step"].count())
-print(BFS["Status"].count("Completed"))
+print(len(BFS))
+print(BFS["Map"][len(BFS)-1])
+#print(BFS)
+#print(BFS["Step"].count())
+#print(BFS["Status"].count("Completed"))

@@ -1,0 +1,81 @@
+Map,Level,Algorithm,Status,Step,Time (s),Memory (MB)
+MINI COSMOS,1,A_star,Completed,37,0.225,3.008
+MINI COSMOS,2,A_star,Completed,60,0.993,11.727
+MINI COSMOS,3,A_star,Completed,69,1.929,18.984
+MINI COSMOS,4,A_star,Completed,71,0.596,8.781
+MINI COSMOS,5,A_star,Completed,104,5.778,40.090
+MINI COSMOS,6,A_star,Completed,99,34.193,119.605
+MINI COSMOS,7,A_star,Completed,61,3.972,32.676
+MINI COSMOS,8,A_star,Completed,93,23.128,95.410
+MINI COSMOS,9,A_star,Completed,85,1.473,21.723
+MINI COSMOS,10,A_star,Completed,102,6.298,45.477
+MINI COSMOS,11,A_star,Completed,74,5.131,39.227
+MINI COSMOS,12,A_star,Completed,112,72.929,181.703
+MINI COSMOS,13,A_star,Completed,80,24.763,101.012
+MINI COSMOS,14,A_star,Time Limit Exceeded,???,???,??? 
+MINI COSMOS,15,A_star,Completed,82,4.262,34.566
+MINI COSMOS,16,A_star,Completed,114,23.318,92.934
+MINI COSMOS,17,A_star,Completed,65,2.423,26.898
+MINI COSMOS,18,A_star,Completed,110,15.025,75.391
+MINI COSMOS,19,A_star,Completed,72,5.520,40.707
+MINI COSMOS,20,A_star,Completed,112,39.193,128.008
+MINI COSMOS,21,A_star,Completed,71,6.050,42.453
+MINI COSMOS,22,A_star,Completed,99,27.355,101.715
+MINI COSMOS,23,A_star,Completed,99,60.015,172.488
+MINI COSMOS,24,A_star,Time Limit Exceeded,???,???,??? 
+MINI COSMOS,25,A_star,Completed,81,5.279,42.469
+MINI COSMOS,26,A_star,Completed,133,59.969,164.578
+MINI COSMOS,27,A_star,Completed,103,8.576,53.645
+MINI COSMOS,28,A_star,Completed,189,86.942,199.652
+MINI COSMOS,29,A_star,Completed,58,4.477,36.184
+MINI COSMOS,30,A_star,Completed,168,171.457,275.430
+MINI COSMOS,31,A_star,Completed,74,0.815,19.891
+MINI COSMOS,32,A_star,Completed,91,0.803,16.121
+MINI COSMOS,33,A_star,Completed,94,5.279,37.027
+MINI COSMOS,34,A_star,Completed,101,10.042,54.562
+MINI COSMOS,35,A_star,Completed,88,1.407,18.133
+MINI COSMOS,36,A_star,Completed,72,3.375,25.312
+MINI COSMOS,37,A_star,Completed,96,4.233,31.734
+MINI COSMOS,38,A_star,Completed,50,4.259,27.328
+MINI COSMOS,39,A_star,Completed,100,19.323,88.199
+MINI COSMOS,40,A_star,Completed,84,3.771,27.121
+MICRO COSMOS,1,A_star,Completed,49,181.942,257.363
+MICRO COSMOS,2,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,3,A_star,Completed,123,36.571,124.957
+MICRO COSMOS,4,A_star,Completed,107,444.198,333.023
+MICRO COSMOS,5,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,6,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,7,A_star,Completed,110,13.321,63.801
+MICRO COSMOS,8,A_star,Completed,89,188.711,269.102
+MICRO COSMOS,9,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,10,A_star,Completed,117,104.369,208.105
+MICRO COSMOS,11,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,12,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,13,A_star,Completed,128,64.212,127.129
+MICRO COSMOS,14,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,15,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,16,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,17,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,18,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,19,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,20,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,21,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,22,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,23,A_star,Completed,91,25.817,99.434
+MICRO COSMOS,24,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,25,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,26,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,27,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,28,A_star,Completed,73,2.622,19.645
+MICRO COSMOS,29,A_star,Completed,83,6.659,33.445
+MICRO COSMOS,30,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,31,A_star,Completed,101,18.803,92.488
+MICRO COSMOS,32,A_star,Completed,82,41.782,146.238
+MICRO COSMOS,33,A_star,Completed,173,546.361,505.062
+MICRO COSMOS,34,A_star,Completed,100,62.789,176.133
+MICRO COSMOS,35,A_star,Completed,70,24.236,94.492
+MICRO COSMOS,36,A_star,Completed,98,268.322,328.090
+MICRO COSMOS,37,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,38,A_star,Time Limit Exceeded,???,???,??? 
+MICRO COSMOS,39,A_star,Completed,151,89.868,199.383
+MICRO COSMOS,40,A_star,Completed,150,35.636,129.516
