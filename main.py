@@ -91,7 +91,10 @@ stepNode = 0
 visualized = 0
 moves = []
 history = 0
-
+name = ''
+actions = []
+ptr = -1
+itemMemory = psutil.Process(os.getpid()).memory_info().rss/(1024*1024)
 
 #---------------------
 # Setup Items 
@@ -108,8 +111,8 @@ box = pygame.transform.scale(box, (lengthSquare, lengthSquare))
 goal = pygame.image.load('Items/goal.png')
 goal = pygame.transform.scale(goal, (lengthSquare, lengthSquare))
 
-player = pygame.image.load('Items/player.png')
-player = pygame.transform.scale(player, (lengthSquare, lengthSquare))
+player_ = pygame.image.load('Items/player.png')
+player_ = pygame.transform.scale(player_, (lengthSquare, lengthSquare))
 
 up_arrow = pygame.image.load("Items/up_arrow.png")
 up_arrow = pygame.transform.scale(up_arrow, (20, 20))
@@ -264,7 +267,7 @@ def display_content_step_3():
 	surface.blit(statusText, [700 + 127, 0 + 458])
 
 	if not (mode >= 2 and win == 0):
-		timeText = helpFont.render("{:0.3f} s".format(timeTook), True, GREEN_LIGHT)
+		timeText = helpFont.render("{:0.6f} s".format(timeTook), True, GREEN_LIGHT)
 		stepText = helpFont.render(f"{stepNode}", True, GREEN_LIGHT)
 		pushedText = helpFont.render(f"{pushed}", True, GREEN_LIGHT)
 
@@ -348,27 +351,27 @@ def draw_menu():
 			display_step_3(GREEN_DARK, mode = mode)
 			display_record()
 
-def draw_board(board):
+def draw_board():
 	draw_menu()
 
-	for point in board.walls:
-		surface.blit(wall, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y])
+	for point in walls:
+		surface.blit(wall, [offsetX + lengthSquare * point[0], offsetY + lengthSquare * point[1]])
 	
-	for point in board.paths:
-		pygame.draw.rect(surface, WHITE, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y, lengthSquare, lengthSquare])
+	for point in paths:
+		pygame.draw.rect(surface, WHITE, [offsetX + lengthSquare * point[0], offsetY + lengthSquare * point[1], lengthSquare, lengthSquare])
 
 	# # Debug dead_squares
-	# for point in board.dead_squares:
-	# 	pygame.draw.rect(surface, RED, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y, lengthSquare, lengthSquare])
+	# for point in dead_squares:
+	# 	pygame.draw.rect(surface, RED, [offsetX + lengthSquare * point[0], offsetY + lengthSquare * point[1], lengthSquare, lengthSquare])
 
-	for point in board.goals:
-		surface.blit(goal, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y])
+	for point in goals:
+		surface.blit(goal, [offsetX + lengthSquare * point[0], offsetY + lengthSquare * point[1]])
 
-	point = board.player
-	surface.blit(player, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y])
+	point = player
+	surface.blit(player_, [offsetX + lengthSquare * point[0], offsetY + lengthSquare * point[1]])
 
-	for point in board.boxes:
-		surface.blit(box, [offsetX + lengthSquare * point.x, offsetY + lengthSquare * point.y])
+	for point in boxes:
+		surface.blit(box, [offsetX + lengthSquare * point[0], offsetY + lengthSquare * point[1]])
 
 	display_title()
 	pygame.display.flip()
@@ -379,13 +382,17 @@ def draw_board(board):
 # Refresh Data
 #-----------------
 def reset_data():
-	global board, numsCol, numsRow, numsUnit, lengthSquare, offsetX, offsetY, wall, box, goal, player
+	global numsCol, numsRow, numsUnit, lengthSquare, offsetX, offsetY, wall, box, goal, player_, walls, goals, boxes, paths, player, name, distanceToGoal, dead_squares, actions, ptr
 	
 	wall = pygame.image.load('Items/wall.png')
 	box = pygame.image.load('Items/box.png')
 	goal = pygame.image.load('Items/goal.png')
-	player = pygame.image.load('Items/player.png')
-	numsRow, numsCol = board.set_value("./Testcases/{}/{}.txt".format(map_list[map_index], level+1))
+	player_ = pygame.image.load('Items/player.png')
+	name = "./Testcases/{}/{}.txt".format(map_list[map_index], level+1)
+	walls, goals, boxes, paths, player, numsRow, numsCol = set_value(name)
+	distanceToGoal, dead_squares = set_distance()
+	actions = []
+	ptr = -1
 
 	numsUnit = max(numsCol, numsRow)
 	lengthSquare = int(WIDTH/numsUnit)
@@ -396,11 +403,10 @@ def reset_data():
 	wall = pygame.transform.scale(wall, (lengthSquare, lengthSquare))
 	box = pygame.transform.scale(box, (lengthSquare, lengthSquare))
 	goal = pygame.transform.scale(goal, (lengthSquare, lengthSquare))
-	player = pygame.transform.scale(player, (lengthSquare, lengthSquare))
-
+	player_ = pygame.transform.scale(player_, (lengthSquare, lengthSquare))
 
 def init_data():
-	global move, win, step, timeTook, pushed, startTime, stepNode, map_index, level, board, numsRow, numsCol, numsUnit, lengthSquare, offsetX, offsetY, visualized, moves, history
+	global move, win, step, timeTook, pushed, startTime, stepNode, map_index, level, board, numsRow, numsCol, numsUnit, lengthSquare, offsetX, offsetY, visualized, actions
 	
 	mode = 0
 	win = 0
@@ -410,64 +416,17 @@ def init_data():
 	startTime = 0
 	stepNode = 0
 	visualized = 0
-	moves = []
-	history = 0
-
-	board.clear_value()
+	actions = []
 	reset_data()
 
 
 #------------------------
-# Setting Data Structures
+# Setting Data Structures and Functionalities
 #------------------------
-class Point:
-	'''
-	(self.x, self.y): works as a coordinate on board 
-	=> It works like a tuple (x,y) but more extended with some function to interact with other Points such as add, double, subtract,...
-	'''
-	def __init__(self):
-		self.x = -1
-		self.y = -1
-
-	def __init__(self, x, y):
-		self.x = x
-		self.y = y
-
-	def __eq__(self, point):
-		if self.x == point.x and self.y == point.y:
-			return True
-		else:
-			return False
-	# Magic method: https://www.python-course.eu/python3_magic_methods.php
-	def __add__(self, point):
-		x = self.x + point.x
-		y = self.y + point.y
-		return Point(x, y)
-
-	def __sub__(self, point):
-		x = self.x - point.x
-		y = self.y - point.y
-		return Point(x, y)
-
-	def double(self):
-		return Point(self.x*2, self.y*2)
-
-	# Error unhashable type
-	def __key(self):
-		return (self.x, self.y)
-
-	def __hash__(self):
-		return hash(self.__key())
-
-	def get_point(self):
-		print("(" + str(self.x) + "," + str(self.y) + ")", end = " ")
-	
 class Direction:
 	'''
 	vector: we can define it as object of class Point that we have define above, so that we can add 2 Point or double it for checking
 	char: character represent for its direction, that we can print results
-	=>  We want to dogde many if else as much as possible because it will cause more errors when coding.
-	=>  Such as when we go Left, we just add current Point with Point(-1,0),...
 	'''
 	def __init__(self, vector, char):
 		self.vector = vector
@@ -476,272 +435,167 @@ class Direction:
 	def get_char(self):
 		return self.char
 
-class Move:
-	def __init__(self, direction, pushed):
-		self.direction = direction # a object of class Direction
-		self.pushed = pushed # boolean value for checking box is pushed or not
-
 # We set the coordinate from top-left corner and x-axis and y-axis as default
-L = Direction(Point(-1, 0), 'L')
-R = Direction(Point(1, 0), 'R')
-U = Direction(Point(0, -1), 'U')
-D = Direction(Point(0, 1), 'D')
+L = Direction((-1, 0), 'L')
+R = Direction((1, 0), 'R')
+U = Direction((0, -1), 'U')
+D = Direction((0, 1), 'D')
 directions = [U, L, D, R] # clock-wise
 
-class Board:
-	# Use set() DataStructure for saving wall, goal, box, player
-	# set() in Python is implemented as hashmap with finding and adding or deleting operator just cost time complexity O(1), in worst-case it still cost O(n) since hashing collision
-	# set() is the same as 2d-array in time and space complexity, but it's convenient that it's support function such as union(), issubset(),..
-	def __init__(self):
-		self.name = ''
-		self.history_moves = [] # List of tuple Move()
-		self.available_moves = []
-		self.walls = set() # set of Point()
-		self.goals = set()
-		self.boxes = set()
-		self.paths = set()
-		self.lose = -1
-		self.player = None
-		self.step = 0
-		self.pushed = 0
-		self.ptr = -1
-		self.x = -1
-		self.y = -1
-		self.cost = 1e9  # used for heuristic search: A* algorithm
-		self.distanceToGoal = dict() # Nested dictionary
-		self.dead_squares = set()
 
-	def clear_value(self):
-		self.name = ''
-		self.history_moves = []
-		self.available_moves = []
-		self.walls = set()
-		self.goals = set()
-		self.boxes = set()
-		self.paths = set()
-		self.lose = -1
-		self.player = None
-		self.step = 0
-		self.pushed = 0
-		self.ptr = -1
-		self.x = -1
-		self.y = -1
-		self.cost = 1e9
-		self.distanceToGoal = dict()
-		self.dead_squares = set()
 
-	def __eq__(self, other):
-		return self.boxes == other.boxes and self.player == other.player
+#$$ Rule for moving in SOKOBAN map, the rules below will apply for 4 directions: UP, DOWN, LEFT, RIGHT
+# Rule 1: If the forward cell is empty, we literally can move
+# Rule 2: If the forward cell has a wall, we can not move
+# Rule 3: If the forward cell has a box:
+	# Rule 3.1: If the forward of forward cell has a box or a wall, we can not move 
+	# Rule 3.2: If the forward of forward cell not contains a box or a wall, we can move forward and push the box forward 
 
-	def __key(self):
-		return (self.name)
-
-	def __hash__(self):
-		return hash(self.__key())
-
-	def add_wall(self, x, y):
-		self.walls.add(Point(x,y))
-
-	def add_goal(self, x, y):
-		self.goals.add(Point(x,y))
-
-	def add_box(self, x, y):
-		self.boxes.add(Point(x,y))
-
-	def add_path(self, x, y):
-		self.paths.add(Point(x,y))
-
-	def add_player(self, x, y):
-		self.player = Point(x,y)
-
-	def get_history_moves(self):
-		return ", ".join(list(map(lambda move: move.direction.char, self.history_moves)))
-
-	#$$ Rule for moving in SOKOBAN map, the rules below will apply for 4 directions: UP, DOWN, LEFT, RIGHT
-	# Rule 1: If the forward cell is empty, we literally can move
-	# Rule 2: If the forward cell has a wall, we can not move
-	# Rule 3: If the forward cell has a box:
-		# Rule 3.1: If the forward of forward cell has a box or a wall, we can not move 
-		# Rule 3.2: If the forward of forward cell not contains a box or a wall, we can move forward and push the box forward 
-
-	def set_available_moves(self): 
-		# Setup attribute available_moves as a list storing legal moves up to date which is a subset of directions list (<= 4 elements)
-		# Available moves <=> Rule 1 + Rule 3.2
-		self.available_moves = []
-		for direction in directions:
-			if self.player + direction.vector not in self.walls:
-				# forward cell can be a box or empty
-				if self.player + direction.vector in self.boxes:
-					# forward cell contains a box
-					if self.player + direction.vector.double() not in self.walls.union(self.boxes):
-						self.available_moves.append(direction)
-				else:
-					# forward cell is empty
-					self.available_moves.append(direction)
-
-	def direction_in_available(self, m):
-		for i in self.available_moves:
-			if (i.get_char() == m.get_char()):
-				return True
-		return False
-
-	# Move the player with direction but the argument make sure direction in the available_moves 
-	def move(self, direction, redo = False, move = True):	
-		if (self.direction_in_available(direction)):
-			self.ptr += 1
-			if move == True:
-				if self.ptr < len(self.history_moves):
-					# Cut the list
-					self.history_moves = self.history_moves[0:self.ptr]
-				if self.ptr <= self.lose:
-					self.lose = -1 
-			temp = self.player + direction.vector
-			
-			self.step += 1
-			if temp in self.boxes:
-				# We push the box forward, so we need to remove the current position and add the forward position
-				self.pushed += 1
-				self.boxes.remove(temp)
-				self.boxes.add(temp + direction.vector)
-				if redo == False:
-					self.history_moves.append(Move(direction, 1))
-
-				# Check lose or not
-				if self.lose == -1:
-					curr_box = temp + direction.vector
-					if curr_box in self.dead_squares:
-						self.lose = self.ptr
+def set_available_moves(player, boxes): 
+	# Setup attribute available_moves as a list storing legal moves up to date which is a subset of directions list (<= 4 elements)
+	# Available moves <=> Rule 1 + Rule 3.2
+	available_moves = []
+	for direction in directions:
+		if (player[0] + direction.vector[0], player[1] + direction.vector[1]) not in walls:
+			# forward cell can be a box or empty
+			if (player[0] + direction.vector[0], player[1] + direction.vector[1]) in boxes:
+				# forward cell contains a box
+				if ((player[0] + 2*direction.vector[0], player[1] + 2*direction.vector[1]) not in walls) and ((player[0] + 2*direction.vector[0], player[1] + 2*direction.vector[1]) not in boxes):
+					available_moves.append(direction)
 			else:
-				if redo == False:
-					self.history_moves.append(Move(direction, 0))
-			self.player = temp
-		self.set_available_moves()
-		self.minimum_cost()
+				# forward cell is empty
+				available_moves.append(direction)
+	return available_moves
 
-	def undo(self):
-		if self.ptr > -1:
-			move = self.history_moves[self.ptr]
-			if move.pushed == 1:
-				self.pushed -= 1
-				self.boxes.remove(self.player + move.direction.vector)
-				self.boxes.add(self.player)
+# Move the player with direction but the argument make sure direction in the available_moves 
+def move(player, boxes, direction):	
+	temp = (player[0] + direction.vector[0], player[1] + direction.vector[1])
+	is_pushed = 0
+	res = True
+	boxes = set(boxes)
+	if temp in boxes:
+		is_pushed = 1
+		boxes.remove(temp)
+		boxes.add((player[0] + 2*direction.vector[0], player[1] + 2*direction.vector[1]))
+		
+		if (player[0] + 2*direction.vector[0], player[1] + 2*direction.vector[1]) in dead_squares:
+			res = False
+	boxes = tuple(boxes) 
+	player = temp
+	return res, is_pushed, player, boxes
 
-			self.player = self.player - move.direction.vector
-			self.step -= 1
-			self.ptr -= 1
-		self.set_available_moves()
-		self.minimum_cost()
+def is_win(goals, boxes):
+	return goals.issubset(boxes)
 
-	def redo(self):
-		if self.ptr < len(self.history_moves) - 1:
-			self.move(self.history_moves[self.ptr + 1].direction, redo = True, move = False)
+def undo():
+	global player, boxes, ptr, stepNode, pushed
+	if ptr > -1:
+		move = actions[ptr]
+		boxes = set(boxes)
+		if move[1] == 1:
+			pushed -= 1
+			boxes.remove((player[0] + move[0].vector[0], player[1] + move[0].vector[1]))
+			boxes.add(player)
+		boxes = tuple(boxes)
+		player = (player[0] - move[0].vector[0], player[1] - move[0].vector[1])
+		stepNode -= 1
+		ptr -= 1
 
-	def is_lose(self):
-		if self.lose != -1:
-			if self.ptr >= self.lose:
-				return True
-		return False
+def redo():
+	global player, boxes, ptr, stepNode, pushed
+	if ptr < len(actions) - 1:
+		_, is_pushed, player, boxes = move(player, boxes, actions[ptr + 1][0])
+		ptr += 1
+		stepNode += 1
+		pushed += is_pushed
 
-	def is_win(self):
-		if self.goals.issubset(self.boxes):
-			return True
-		else:
-			return False
+def set_distance():
+	distanceToGoal = dict()
+	dead_squares = set()
+	for goal in goals:
+		distanceToGoal[goal] = dict()
+		for path in paths:
+			distanceToGoal[goal][path] = 1e9
+	queue = Queue()
+	for goal in goals:
+		distanceToGoal[goal][goal] = 0
+		queue.put(goal)
+		while not queue.empty():
+			position = queue.get()
+			for direction in directions:
+				boxPosition = (position[0] + direction.vector[0], position[1] + direction.vector[1])
+				playerPosition = (position[0] + 2*direction.vector[0], position[1] + 2*direction.vector[1])
+				if boxPosition in paths:
+					if distanceToGoal[goal][boxPosition] == 1e9:
+						if (boxPosition not in walls) and (playerPosition not in walls):
+							distanceToGoal[goal][boxPosition] = distanceToGoal[goal][position] + 1
+							queue.put(boxPosition)
+	# Add dead squares
+	for path in paths:
+		ok = 1
+		for goal in goals:	
+			if distanceToGoal[goal][path] != 1e9:
+				ok = 0
+				break
+		if ok == 1:
+			dead_squares.add(path)
+	return distanceToGoal, dead_squares
 
-	def set_distance(self):
-		for goal in self.goals:
-			self.distanceToGoal[goal] = dict()
-			for path in self.paths:
-				self.distanceToGoal[goal][path] = math.inf
-		queue = Queue()
-		for goal in self.goals:
-			self.distanceToGoal[goal][goal] = 0
-			queue.put(goal)
-			while not queue.empty():
-				position = queue.get()
-				for direction in directions:
-					boxPosition = position + direction.vector
-					playerPosition = position + direction.vector.double()
-					if boxPosition in self.paths:
-						if self.distanceToGoal[goal][boxPosition] == math.inf:
-							if (boxPosition not in self.walls) and (playerPosition not in self.walls):
-								self.distanceToGoal[goal][boxPosition] = self.distanceToGoal[goal][position] + 1
-								queue.put(boxPosition)
-		# Add dead squares
-		for path in self.paths:
-			ok = 1
-			for goal in self.goals:	
-				if self.distanceToGoal[goal][path] != math.inf:
-					ok = 0
-					break
-			if ok == 1:
-				self.dead_squares.add(path)
+def minimum_cost(step, boxes):
+	# Minimum of matching all distances from all goals to all boxes (Assignment Problem) using Hungarian Algorithm
+	temp = []
+	for goal in goals:
+		for box in boxes:
+			## Using Manhattan distance
+			# temp.append(abs(goal[0] - box[0]) + abs(goal[1] - box[1])) 
 
-	def minimum_cost(self):
-		# Minimum of matching all distances from all goals to all boxes (Assignment Problem) using Hungarian Algorithm
-		temp = []
-		for goal in self.goals:
-			for box in self.boxes:
-				## Using Manhattan distance
-				# temp.append(abs(goal.x - box.x) + abs(goal.y - box.y)) 
+			## Using DistanceToGoal 2d-array
+			temp.append(distanceToGoal[goal][box])
 
-				## Using DistanceToGoal 2d-array
-				if self.distanceToGoal[goal][box] == math.inf:
-					temp.append(1e9)
-				else:
-					temp.append(self.distanceToGoal[goal][box])
+	arr = np.array(temp)
+	# Make matrix with row is goal and colum is box
+	cost = arr.reshape(len(goals), len(boxes))
+	row_ind, col_ind = linear_sum_assignment(cost) # Hungarian Algorithm
+	return cost[row_ind, col_ind].sum() + step # f(n) = g(n) + h(n)
 
-		arr = np.array(temp)
-		# Make matrix with row is goal and colum is box
-		cost = arr.reshape(len(self.goals), len(self.boxes))
-		row_ind, col_ind = linear_sum_assignment(cost) # Hungarian Algorithm
-		self.cost = cost[row_ind, col_ind].sum() + len(self.history_moves) # f(n) = g(n) + h(n)
-
-	def set_value(self, filename):
-		self.clear_value()
-		self.name = filename
-		x = 0
-		y = 0
-		with open(filename, 'r') as f:
-			read_data = f.read()
-			lines = read_data.split('\n')	
-			for line in lines:
-				x = 0
-				for char in line:
-					if char == '#': # Wall
-						self.add_wall(x,y)
-					elif char == 'x': # Box
-						self.add_box(x,y)
-						self.add_path(x,y)
-					elif char == '?': # Goal
-						self.add_goal(x,y)
-						self.add_path(x,y)
-					elif char == '@': # Player
-						self.add_player(x,y)
-						self.add_path(x,y)
-					elif char == '-': # Player and Goal
-						self.add_goal(x,y)
-						self.add_player(x,y)
-						self.add_path(x,y)
-					elif char == '+': # Box and Goal
-						self.add_goal(x,y)
-						self.add_box(x,y)
-						self.add_path(x,y)
-					elif char == '.': # Path - avaiable move
-						self.add_path(x,y)
-					x += 1
-				y += 1
-		self.set_available_moves()
-		self.set_distance()
-		self.minimum_cost()
-		return (x,y)
-
-board = Board()
-reset_data()
-
-# Initialize memory
-proc1 = psutil.Process(os.getpid())
-itemMemory = proc1.memory_info().rss/(1024*1024)
+def set_value(filename):
+	walls = set() # set of Point()
+	goals = set()
+	boxes = []
+	paths = set()
+	player = None
+	x = 0
+	y = 0
+	with open(filename, 'r') as f:
+		read_data = f.read()
+		lines = read_data.split('\n')	
+		for line in lines:
+			x = 0
+			for char in line:
+				if char == '#': # Wall
+					walls.add((x,y))
+				elif char == 'x': # Box
+					boxes.append((x,y))
+					paths.add((x,y))
+				elif char == '?': # Goal
+					goals.add((x,y))
+					paths.add((x,y))
+				elif char == '@': # Player
+					player = (x,y)
+					paths.add((x,y))
+				elif char == '-': # Player and Goal
+					goals.add((x,y))
+					player = (x,y)
+					paths.add((x,y))
+				elif char == '+': # Box and Goal
+					goals.add((x,y))
+					boxes.append((x,y))
+					paths.add((x,y))
+				elif char == '.': # Path - avaiable move
+					paths.add((x,y))
+				x += 1
+			y += 1
+	return walls, goals, tuple(boxes), paths, player, x, y
 
 
 #----------------------
@@ -762,35 +616,6 @@ def print_results(board, gen, rep, expl, memo, dur):
 	print("Memory: ", str(memo), " MB")  # in megabytes
 	print('Duration: ' + str(dur) + ' secs')
 
-
-def equalSet(child, explored):
-	for ele in explored:
-		if (child.__eq__(ele)):
-			return True
-	return False
-
-def print_player(node):
-	node.player.get_point()
-
-def print_box(node):
-	for i in node.boxes:
-		i.get_point()
-		print(" ", end='')
-
-def print_status(node):
-	for m in node.available_moves:
-		print(m.get_char(), end=" ")
-	print()
-	print("Position of player: ", end="")
-	print_player(node)
-	print()
-	print("Position of box: ", end="")
-	print_box(node)
-	print()
-	if mode == 3: 
-		print("Cost: ", node.cost, end="")
-		print()
-
 def line_prepender(filename, algo, sol, ste, gen, rep, expl, memo, dur):
 	if not os.path.exists('Results'):
 		os.mkdir('Results')
@@ -801,7 +626,7 @@ def line_prepender(filename, algo, sol, ste, gen, rep, expl, memo, dur):
 		f.seek(0, 0)
 		dt_string = datetime.now().strftime("%d/%m/%Y %H:%M:%S %p")
 		f.write("Datatime (UTC+7): " + dt_string + '\n')
-		f.write("Problem: " + board.name.split('./')[-1] + '\n')
+		f.write("Problem: " + name.split('./')[-1] + '\n')
 		f.write("Algorithm: " + algo + '\n')
 		f.write("Solution: " + sol + '\n')
 		f.write("Number of steps: " + str(ste) + '\n')
@@ -818,146 +643,117 @@ def line_prepender(filename, algo, sol, ste, gen, rep, expl, memo, dur):
 
 def add_history(algo, sol, ste, gen, rep, expl, memo, dur):
 	line_prepender('Results/history_log.txt', algo, sol, ste, gen, rep, expl, memo, dur)
-	line_prepender('Results/Solution_{}_test {}'.format(board.name.split('/')[2], board.name.split('/')[3]), algo, sol, ste, gen, rep, expl, memo, dur)
+	line_prepender('Results/Solution_{}_test {}'.format(name.split('/')[2], name.split('/')[3]), algo, sol, ste, gen, rep, expl, memo, dur)
+
+def get_history_moves(actions):
+	return ", ".join(list(map(lambda move: move[0].char, actions)))
 
 
 #-----------------
 # Setting Alogorithms
 #-----------------
-def bfs(curr_board):
+def bfs(curr_player, curr_boxes):
 	global win, timeTook, startTime
-	startTime = time.time()
-	node_generated = 0
 	node_repeated = 0
-
+	node_generated = 0
 	frontier = Queue()
 	explored = set()
-	frontier.put(curr_board)
-	stayed_Searching = True
+	frontier.put((curr_player, curr_boxes, 0, 0, []))
 
 	node_generated += 1
-	explored.add(board)
-	i = 0
-	while stayed_Searching:
-		i = i + 1
+	explored.add((curr_player, curr_boxes))
+	startTime = time.time()
+	while True:
 		if frontier.empty():
 			print("Solution not found\n")
-			return []
+			return (0, 0, 0, 0, [])
 
-		node = frontier.get()
-		moves = node.available_moves
-
-		print("Start loop " + str(i) + " at node: ", end="")
-		print_status(node)
-
+		(now_player, now_boxes, steps, push, actions) = frontier.get()
+		moves = set_available_moves(now_player,now_boxes)
 		for m in moves:
-			child = deepcopy(node)
-			child.move(m)
-			if (child not in explored) and child.is_lose() == False:
-				explored.add(child)
-				if (child.is_win()):
-					win = 1
+			res, is_pushed, new_player, new_boxes = move(now_player, now_boxes, m)
+			if (new_player, new_boxes) not in explored and res == True:
+				explored.add((new_player, new_boxes))
+				if is_win(goals, new_boxes):							
 					timeTook = time.time() - startTime
-					process = psutil.Process(os.getpid())
-					memo_info = process.memory_info().rss/(1024*1024) - itemMemory
-
-					print_results(child,node_generated,node_repeated,len(explored), memo_info,timeTook)
-
-					add_history("Breadth First Search", child.get_history_moves(), child.step, node_generated, node_repeated, len(explored), memo_info, timeTook)
-					return child.history_moves
-				frontier.put(child)
+					win = 1
+					memo_info = psutil.Process(os.getpid()).memory_info().rss/(1024*1024) - itemMemory
+					add_history("Breadth First Search", get_history_moves(actions + [(m,is_pushed)]), steps + 1, node_generated, node_repeated, len(explored), memo_info, timeTook)
+					return (node_generated + 1, steps + 1, timeTook, memo_info, actions + [(m,is_pushed)])
+				frontier.put((new_player, new_boxes, steps+1, push + is_pushed, actions + [(m,is_pushed)]))
 			else:
 				node_repeated += 1
 			node_generated += 1
-			timeTook = time.time() - startTime
-			# draw_board(board)			
-		print()
-	print(i)
+	
 
-
-def A_star(curr_board):
+def A_star(curr_player, curr_boxes):
 	global win, timeTook, startTime
-	startTime = time.time()
-	node_generated = 0
 	node_repeated = 0
-
-	frontier = SortedList(key=lambda board: board.cost)
+	node_generated = 0
+	frontier = SortedList(key=lambda x: minimum_cost(x[2], x[1]))
 	explored = set()
-	frontier.add(curr_board)
-	stayed_Searching = True
-
+	frontier.add((curr_player, curr_boxes, 0, 0, []))
 	node_generated += 1
-	explored.add(board)
-	i = 0
-	while stayed_Searching:
-		i = i + 1
+	explored.add((curr_player, curr_boxes))
+	startTime = time.time()
+	while True:
 		if len(frontier) == 0:
 			print("Solution not found\n")
-			return []
+			return (0, 0, 0, 0, [])
 
-		node = frontier.pop(0)
-		moves = node.available_moves
-
-		print("Start loop " + str(i) + " at node: ", end="")
-		print_status(node)
-
+		(now_player, now_boxes, steps, push, actions) = frontier.pop(0)
+		moves = set_available_moves(now_player,now_boxes)
 		for m in moves:
-			child = deepcopy(node)
-			child.move(m)
-			if (child not in explored) and child.is_lose() == False:
-				explored.add(child)
-				if (child.is_win()):
-					win = 1
+			res, is_pushed, new_player, new_boxes = move(now_player, now_boxes, m)
+			if (new_player, new_boxes) not in explored and res == True:
+				explored.add((new_player, new_boxes))
+				if is_win(goals, new_boxes):
 					timeTook = time.time() - startTime
-					process = psutil.Process(os.getpid())
-					memo_info = process.memory_info().rss/(1024*1024) - itemMemory
-
-					print_results(child,node_generated,node_repeated,len(explored), memo_info,timeTook)
-
-					add_history("A star", child.get_history_moves(), child.step, node_generated, node_repeated, len(explored), memo_info, timeTook)
-					return child.history_moves
-				frontier.add(child)
+					win = 1
+					memo_info = psutil.Process(os.getpid()).memory_info().rss/(1024*1024) - itemMemory
+					add_history("A star", get_history_moves(actions + [(m,is_pushed)]), steps + 1, node_generated, node_repeated, len(explored), memo_info, timeTook)
+					return (node_generated + 1,steps + 1, timeTook, memo_info, actions + [(m,is_pushed)])
+				frontier.add((new_player, new_boxes, steps + 1, push + is_pushed, actions + [(m,is_pushed)]))
 			else:
 				node_repeated += 1
 			node_generated += 1
-			timeTook = time.time() - startTime
-			# draw_board(board)			
-		print()
-	print(i)
 
 
 #-----------------
-# Setting Game
+# Run Program
 #-----------------
-def main():
-	global board, level, map_index, step, mode, win, stepNode, timeTook, startTime, pushed, visualized, moves, history
+if __name__ == '__main__':
+	name = "./Testcases/{}/{}.txt".format(map_list[0],1)
+	walls, goals, boxes, paths, player, _, _ = set_value(name)
+	distanceToGoal, dead_squares = set_distance()
+	
 	while True:
 		clock.tick(FPS)
-		if board.is_win() == True and mode == 1:
+		if is_win(goals, boxes) == True and mode == 1:
 			win = 1
 			# This result has been recorded in Results folder
 			if history == 0:
-				add_history("Manually", board.get_history_moves(), board.step, 0, 0, 0, 0, timeTook)
+				add_history("Manually", get_history_moves(actions), stepNode, 0, 0, 0, 0, timeTook)
 				history = 1
 
 		if step == 3 and win == 0 and mode == 1:
 			timeTook = time.time() - startTime
 
-
 		if step == 3 and mode == 2 and win == 0:
-			moves = bfs(board)
+			(node_created, steps, times, memo, moves) = bfs(player, boxes)
 
 		if step == 3 and mode == 3 and win == 0:
-			moves = A_star(board)
+			(node_created, steps, times, memo, moves) = A_star(player, boxes)
 
 		if len(moves) > 0 and visualized == 1:
-			board.move(moves[0].direction)
+			(_, is_pushed, player, boxes) = move(player, boxes, moves[0][0])
+			actions.append(moves[0])
 			moves.pop(0)
-			stepNode = board.step
-			pushed = board.pushed
-			# draw_board(board)
-			
+			stepNode += 1
+			pushed += is_pushed
+			ptr += 1
 			time.sleep(0.3)
+			
 
 		for event in pygame.event.get():
 			keys_pressed = pygame.key.get_pressed()
@@ -968,21 +764,41 @@ def main():
 				if step == 3:
 					if mode == 1 and win == 0:
 						if event.key == pygame.K_w or event.key == pygame.K_UP:
-							board.move(U)
-							stepNode = board.step
-							pushed = board.pushed
+							if U in set_available_moves(player, boxes):
+								if ptr + 1 < len(actions):
+									actions = actions[0:(ptr+1)]
+								(_, is_pushed, player, boxes) = move(player, boxes, U)
+								stepNode += 1
+								pushed += is_pushed
+								ptr += 1
+								actions.append((U, is_pushed))
 						elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
-							board.move(D)
-							stepNode = board.step
-							pushed = board.pushed
+							if D in set_available_moves(player, boxes):
+								if ptr + 1 < len(actions):
+									actions = actions[0:(ptr+1)]
+								(_, is_pushed, player, boxes) = move(player, boxes, D)
+								stepNode += 1
+								pushed += is_pushed
+								ptr += 1
+								actions.append((D, is_pushed))
 						elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
-							board.move(L)
-							stepNode = board.step
-							pushed = board.pushed
+							if L in set_available_moves(player, boxes):
+								if ptr + 1 < len(actions):
+									actions = actions[0:(ptr+1)]
+								(_, is_pushed, player, boxes) = move(player, boxes, L)
+								stepNode += 1
+								pushed += is_pushed
+								ptr += 1
+								actions.append((L, is_pushed))
 						elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-							board.move(R)
-							stepNode = board.step
-							pushed = board.pushed
+							if R in set_available_moves(player, boxes):
+								if ptr + 1 < len(actions):
+									actions = actions[0:(ptr+1)]
+								(_, is_pushed, player, boxes) = move(player, boxes, R)
+								stepNode += 1
+								pushed += is_pushed
+								ptr += 1
+								actions.append((R, is_pushed))
 
 			if event.type == pygame.MOUSEBUTTONDOWN:
 				x, y = event.pos
@@ -1012,7 +828,7 @@ def main():
 					if A_rect.collidepoint(x,y):
 						mode = 3
 						step = 3
-						startTime = time.time()
+						continue
 
 				if step == 3:
 					if mode == 1:
@@ -1020,13 +836,9 @@ def main():
 							init_data()
 							step = 1
 						if undo_rect.collidepoint(x,y):
-							board.undo()
-							stepNode = board.step
-							pushed = board.pushed	
+							undo()
 						if redo_rect.collidepoint(x,y):
-							board.redo()
-							stepNode = board.step
-							pushed = board.pushed
+							redo()
 					if mode == 2:
 						#Bfs
 						if restart_rect.collidepoint(x,y):
@@ -1038,13 +850,9 @@ def main():
 									visualized = 1
 							else:
 								if undo_rect.collidepoint(x,y):
-									board.undo()
-									stepNode = board.step
-									pushed = board.pushed	
+									undo()
 								if redo_rect.collidepoint(x,y):
-									board.redo()
-									stepNode = board.step
-									pushed = board.pushed
+									redo()
 					if mode == 3:
 						# A_star
 						if restart_rect.collidepoint(x,y):
@@ -1056,20 +864,9 @@ def main():
 									visualized = 1
 							else:
 								if undo_rect.collidepoint(x,y):
-									board.undo()
-									stepNode = board.step
-									pushed = board.pushed	
+									undo()
 								if redo_rect.collidepoint(x,y):
-									board.redo()
-									stepNode = board.step
-									pushed = board.pushed
+									redo()
 
-		draw_board(board)
+		draw_board()
 		pygame.display.update()
-
-
-#-----------------
-# Run Program
-#-----------------
-if __name__ == '__main__':
-	main()

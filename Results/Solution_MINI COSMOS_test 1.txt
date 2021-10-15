@@ -1,3 +1,99 @@
+Datatime (UTC+7): 15/10/2021 21:04:00 PM
+Problem: Testcases/MINI COSMOS/1.txt
+Algorithm: A star
+Solution: U, U, L, U, U, R, L, D, D, R, R, U, R, R, U, U, L, L, D, D, U, L, L, D, D, R, R, L, D, D, R, R, U, U, L, U, R
+Number of steps: 37
+Nodes generated: 366
+Nodes repeated: 199
+Nodes explored: 168
+Memory: 2.59375 MB
+Duration: 0.0029916763305664062 secs
+
+
+===================================================
+===================================================
+
+
+Datatime (UTC+7): 15/10/2021 21:03:26 PM
+Problem: Testcases/MINI COSMOS/1.txt
+Algorithm: A star
+Solution: U, U, L, U, U, R, L, D, D, R, R, U, R, R, U, U, L, L, D, D, U, L, L, D, D, R, R, L, D, D, R, R, U, U, L, U, R
+Number of steps: 37
+Nodes generated: 366
+Nodes repeated: 199
+Nodes explored: 168
+Memory: 2.52734375 MB
+Duration: 0.0029935836791992188 secs
+
+
+===================================================
+===================================================
+
+
+Datatime (UTC+7): 15/10/2021 20:57:07 PM
+Problem: Testcases/MINI COSMOS/1.txt
+Algorithm: Manually
+Solution: R, L, U, U, R, R, L, U, R, L, D, R, U, L, D, L, L, U, U, R, L, D, D, R, R, R, U, R, U, U, L, L, D, D, U, L, L, D, D, U, U, R, L, R, L, R, L, D, D, R, R, L, D, D, R, R, L, R, U, U, L, U, R
+Number of steps: 63
+Nodes generated: 0
+Nodes repeated: 0
+Nodes explored: 0
+Memory: 0 MB
+Duration: 84.05371117591858 secs
+
+
+===================================================
+===================================================
+
+
+Datatime (UTC+7): 15/10/2021 19:52:56 PM
+Problem: Testcases/MINI COSMOS/1.txt
+Algorithm: Manually
+Solution: U, U, L, U, U, R, L, D, D, R, R, R, U, R, U, U, L, L, D, D, U, L, L, D, D, R, R, L, D, D, R, R, U, U, L, R, D, D, U, R, R, U, U, L, L, R, U, U, L, L, D, D, U, L, L, D, D, R, R, L, D, D, R, R, U, U, L, U, R
+Number of steps: 69
+Nodes generated: 0
+Nodes repeated: 0
+Nodes explored: 0
+Memory: 0 MB
+Duration: 22.51378059387207 secs
+
+
+===================================================
+===================================================
+
+
+Datatime (UTC+7): 15/10/2021 19:47:55 PM
+Problem: Testcases/MINI COSMOS/1.txt
+Algorithm: Manually
+Solution: U, U, L, D, U, D, R, D, D, D, D, R, U, R, U, U, L, R, U, D, R, U, U, L, U, U, R, L, D, D, R, R, R, U, R, U, U, L, L, D, D, U, L, L, D, D, R, R, L, D, D, R, R, U, U, L, U, R
+Number of steps: 37
+Nodes generated: 0
+Nodes repeated: 0
+Nodes explored: 0
+Memory: 0 MB
+Duration: 9.156899690628052 secs
+
+
+===================================================
+===================================================
+
+
+Datatime (UTC+7): 15/10/2021 19:25:01 PM
+Problem: Testcases/MINI COSMOS/1.txt
+Algorithm: Breadth First Search
+Solution: U, U, L, U, U, R, L, D, D, R, R, U, R, R, U, U, L, L, D, D, U, L, L, D, D, R, R, L, D, D, R, R, U, U, L, U, R
+Number of steps: 37
+Nodes generated: 377
+Nodes repeated: 208
+Nodes explored: 170
+Memory: 2.4765625 MB
+Duration: 0.03966951370239258 secs
+
+
+===================================================
+===================================================
+
+
 Datatime (UTC+7): 24/09/2021 19:46:12 PM
 Problem: Testcases/MINI COSMOS/1.txt
 Algorithm: Manually

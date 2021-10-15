@@ -1,3 +1,19 @@
+Datatime (UTC+7): 15/10/2021 19:38:09 PM
+Problem: Testcases/MINI COSMOS/40.txt
+Algorithm: Breadth First Search
+Solution: D, R, R, U, D, L, L, U, R, U, R, D, L, L, D, D, D, R, R, U, R, R, U, U, L, L, U, L, D, L, D, D, D, R, R, U, U, L, R, D, R, R, U, U, L, L, U, U, R, D, L, L, D, R, D, D, R, R, U, U, L, R, D, D, L, L, U, U, L, L, D, R, U, R, R, R, D, D, L, L, D, L, L, U
+Number of steps: 84
+Nodes generated: 4624
+Nodes repeated: 2674
+Nodes explored: 1951
+Memory: 3.28125 MB
+Duration: 0.018915176391601562 secs
+
+
+===================================================
+===================================================
+
+
 Datatime (UTC+7): 23/09/2021 17:12:20 PM
 Problem: Testcases/MINI COSMOS/40.txt
 Algorithm: Breadth First Search
