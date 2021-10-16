@@ -54,6 +54,8 @@ def drawChart(factor,map):
 		ylab = "Step"
 	elif (factor == "Time (s)"):
 		ylab = "sec"
+	elif (factor == "Node generated"):
+		ylab = "Node"
 	else:
 		ylab = "MB"
 
@@ -67,6 +69,8 @@ def drawChart(factor,map):
 		plt.title("The amount of memory used in " + map +  " Testcases")
 	elif (factor == "Time (s)"):
 		plt.title("The amount of time elapsed in " + map + " Testcases")
+	elif (factor == "Node generated"):
+		plt.title("The amount of node generated in " + map + " Testcases")
 	else:
 		plt.title("The number of " + factor + " taken in " + map + " Testcases")
 	plt.legend()
@@ -76,6 +80,8 @@ def drawChart(factor,map):
 		save = "memory"
 	elif (factor == "Step"):
 		save = "step"
+	elif (factor == "Node generated"):
+		save = "nodeGenerated"
 	else:
 		save = "time"
 	plt.savefig("./Charts/" + save + "_" + map + ".png")	
@@ -87,6 +93,8 @@ drawChart("Time (s)", "MINI COSMOS")
 drawChart("Time (s)", "MICRO COSMOS")
 drawChart("Memory (MB)","MINI COSMOS")
 drawChart("Memory (MB)","MICRO COSMOS")
+drawChart("Node generated","MINI COSMOS")
+drawChart("Node generated","MICRO COSMOS")
 
 print(len(BFS))
 print(BFS["Map"][len(BFS)-1])
