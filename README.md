@@ -1,11 +1,11 @@
 # Sokoban game
 **Assignment 1 - Introduction to Artificial Intelligence**  
-This project is aimed to create a `Sokoban` game that we can play manually or using *searching algorithm*, one about `blind search` and one about `heuristic` algorithm, we choose `Breadth First Search` and `A star`. In many library for visualization in Python, our team choose `Pygame` to make the UI of this game. In this project we will play and solve the Sokoban game in 80 maps including 40 testcases in `Micro Cosmos` and 40 testcases in `Mini Cosmos` in this [link](https://ksokoban.online/). All problems and tasks we can see in `assignment1.pdf` file (Vietnamese language).
+This project is aimed to create a `Sokoban` game that we can play manually or automatically using *searching algorithm*. We use two searching algorithms here, the first is 'BFS' for blind search and 'A*' for heuristic search. Our team selects `Pygame` to create the UI of this game. In this project, we are going to play and solve the Sokoban game in 80 maps including 40 testcases in `Micro Cosmos` and 40 testcases in `Mini Cosmos` (source: [link](https://ksokoban.online/)). All problems and tasks we can see in `assignment1.pdf` file (Vietnamese language).
 
 ## Introduction of Sokoban
-Sokoban is a puzzle video game genre in which the player pushes crates or boxes around in a warehouse, trying to get them to storage locations.The game is played on a board of squares, where each square is a floor or a wall. Some floor squares contain boxes, and some floor squares are marked as storage locations.
+Sokoban is a puzzle video game genre in which the player pushes crates or boxes around in a warehouse, trying to get them to some goal locations.The game is played on a board of squares, where each square is a floor or a wall. Some floor squares contain boxes, and some floor squares are marked as goal locations.
 
-The player is confined to the board and may move horizontally or vertically onto empty squares (never through walls or boxes). The player can move a box by walking up to it and push it to the square beyond. Boxes cannot be pulled, and they cannot be pushed to squares with walls or other boxes. The number of boxes equals the number of storage locations. The puzzle is solved when all boxes are placed at storage locations.  
+The player is confined to the board and may move horizontally or vertically onto empty squares (never through walls or boxes). The player can move a box by walking up to it and push it to the square in front. Boxes cannot be pulled, and they cannot be pushed to squares with walls or other boxes. The number of boxes equals the number of storage locations. The puzzle is solved when all boxes are placed at storage locations.  
 **Refs:** https://en.wikipedia.org/wiki/Sokoban
 ![](Images/sokoban.png)
 
@@ -59,7 +59,7 @@ $ python statistic.py
 ![](Charts/memory_MICRO%20COSMOS.png)
 ## How to use?
 ### Step 1
-Firstly, we need to suitable map that we want to solve. By clicking the up arrow or down arrow to choose level between 1 and 40 or clicking change button to toogle between Mini Cosmos and Macro Cosmos.  When we changing occur, the map of game is appear currently in the board in the left
+Firstly, we need to suitable map that we want to solve. You can click the up or down arrow to choose level between 1 and 40 or clicking the change button to toogle between Mini Cosmos and Macro Cosmos.  When change occurs, the new map is displayed in the left side.
 *Note:* The map and the level is not sorted by the difficulty. Some adjance map may just have some same things in the map and deffrent in the position of boxes or goals or player.
 ![](Images/step1.png)
 ### Step 2
@@ -67,7 +67,7 @@ Choose your game play. In this step, we have only 3 options including `Manually`
 ![](Images/step2.png)
 
 ### Step 3
-In the process of moving in self-playing, we can undo and redo or restart a new game. We can control the player with 4-direction by some instructions below:
+In the process of moving in self-playing, we can undo and redo or restart a new game. We can control the player in 4-direction by some instructions below:
 + Click `Up arrow` or `W` to go **up**.
 + Click `Down arrow` or `S` to go **down**.
 + Click `Left arrow` or `A` to go **left**.
@@ -75,7 +75,7 @@ In the process of moving in self-playing, we can undo and redo or restart a new 
 
 The move is available if it satisfies some rules including:  
 + The forward cell is not the wall.
-+ If the forward cell is a box, we consider the forward of the forward cell. If that is not a box or a wall. We can move forward and simultaneously push the box to forward cell.
++ If the forward cell is a box, we consider the forward of the forward cell. If that is not a box or a wall, we can move forward and simultaneously push the box to forward cell.
 
 ![](Images/step3.png)
 
