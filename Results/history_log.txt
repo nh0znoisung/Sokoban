@@ -1,3 +1,35 @@
+Datatime (UTC+7): 20/10/2021 19:38:34 PM
+Problem: Testcases/MICRO COSMOS/5.txt
+Algorithm: Breadth First Search
+Solution: R, L, D, D, R, D, R, R, U, L, U, U, U, R, U, U, L, D, D, D, L, L, U, U, R, L, D, D, D, D, L, D, L, L, U, R, U, U, U, U, R, R, D, D, L, R, D, D, L, D, L, L, U, R, U, U, R, R, D, D, L, D, L, U, R, R, R, D, R, R, U, L, L, L, U, U, R, R, D, U, U, R, U, U, L, D, D, D, L, L, U, U, R, L, D, D, R, R, U, R, U, U, L, D, L, L, D, D, D, D, R, D, R, R, U, L
+Number of steps: 116
+Nodes generated: 1041481
+Nodes repeated: 610024
+Nodes explored: 431458
+Memory: 118.140625 MB
+Duration: 5.661398887634277 secs
+
+
+===================================================
+===================================================
+
+
+Datatime (UTC+7): 20/10/2021 19:35:34 PM
+Problem: Testcases/MICRO COSMOS/5.txt
+Algorithm: Breadth First Search
+Solution: R, L, D, D, R, D, R, R, U, L, U, U, U, R, U, U, L, D, D, D, L, L, U, U, R, L, D, D, D, D, L, D, L, L, U, R, U, U, U, U, R, R, D, D, L, R, D, D, L, D, L, L, U, R, U, U, R, R, D, D, L, D, L, U, R, R, R, D, R, R, U, L, L, L, U, U, R, R, D, U, U, R, U, U, L, D, D, D, L, L, U, U, R, L, D, D, R, R, U, R, U, U, L, D, L, L, D, D, D, D, R, D, R, R, U, L
+Number of steps: 116
+Nodes generated: 1041481
+Nodes repeated: 610024
+Nodes explored: 431458
+Memory: 117.88671875 MB
+Duration: 6.213346004486084 secs
+
+
+===================================================
+===================================================
+
+
 Datatime (UTC+7): 15/10/2021 21:20:10 PM
 Problem: Testcases/MINI COSMOS/3.txt
 Algorithm: A star
