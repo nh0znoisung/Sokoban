@@ -52,7 +52,10 @@ For `A star` algorithm testing result
 $ python test_Astar.py
 ```
 Before running these command above, we need to delete the `BFS.csv` and `A_star` file. Because it will firstly loading the number of testcase that we solved in the last visit in order to the case that we don't need to run all testcases from scratch.
-![](Images/BFS.png)
+<div align="center">
+<img src="Images/BFS.png" align="center"/>
+</div> 
+
 
 The statistic we use for analyzing is stored in `BFS_auth.csv` and `A_star_auth.csv` file. This result recorded when run on *`Windows 10, CPU Intel Core i5 8250U - 8th generation, RAM 16Gb, SSD 240Gb`* and all are gathering and editing in `all_test.xlsx`
 ![](Images/all_test.png)
@@ -89,8 +92,10 @@ After solving by user or algorithm, the program will automatically save the winn
 By solving the testcase by algorithm, we have `Visualize button` to simulate the player with the solution that found before.
 ![](Images/step3-BFS.png)
 ## Work Flow
-1. At first, we need to generate these testcases. In this link [link](https://ksokoban.online/), we convert 80 maps into 80 text files manually with some notation. For example, player is @, wall is #, box is x, goal is ?,...
-![](Images/testcase.png)
+1. At first, we need to generate these testcases. In this link [link](https://ksokoban.online/), we convert 80 maps into 80 text files manually with some notation. For example, player is @, wall is #, box is x, goal is ?,...  
+<div align="center">
+<img src="Images/testcase.png" align="center"/>
+</div> 
 2. Next, we create UI with pygame including board display game and the menu in the right-hand side with some button, mode and information about game.
 3. We choose available data structure. For example, walls and goals is the list of positions and usually searching through list, so we choose set because it is designed as hash map so searching operator with O(1). Apart from it, boxes have fixed length and used to store state and insert to queue or priority queue so we use tuple since it is hashable.
 4. We design the algorithm, we use the idea in this [link](https://baldur.iti.kit.edu/theses/SokobanPortfolio.pdf) in order to custom the cost of heuristic function by using more concept distanceToGoal array (Find the minimum length of paths from a goal to go to particular squares in the board. Note that this is the possible path so that we can push the box from this position to that goal with this length instead of physical distance such as Matthan or Euler), Dead squares (The cells that we put the box at this position, we can not go to any goals) and Maching algorithm - Hungarian algorithm (Find the minimum cost when matching each box to each goal. It basically cost time complexity O(n!) but it will reduce to O(n^3) when using Hungarian algorithm) 
@@ -104,8 +109,10 @@ By solving the testcase by algorithm, we have `Visualize button` to simulate the
 + Slide for presentation (Vietnamese language): `slide.pdf`
 
 ## Conclusion
-BFS is more effective compare to A* in this case. One of the reason is the 
-![](Charts/Average.png)
+BFS is more effective compare to A* in this case. One of the reason is the  
+<div align="center">
+<img src="Charts/Average.png" align="center"/>
+</div>
 
 ## Future project
 + This current map is restricted with 80 testcases. We can extend it more map in the collection of game in this [link](https://ksokoban.online/) such as `pico cosmos`, `nabo cosmos`,` DH1 collection`,.... We can totally do this by using crawling data map and position of another items with Selenium tool. There are apporximately 1000-2000 maps in this Web.
