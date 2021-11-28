@@ -5,9 +5,13 @@ This project is aimed to create a `Sokoban` game that we can play manually or au
 ## Introduction of Sokoban
 Sokoban is a puzzle video game genre in which the player pushes crates or boxes around in a warehouse, trying to get them to some goal locations.The game is played on a board of squares, where each square is a floor or a wall. Some floor squares contain boxes, and some floor squares are marked as goal locations.
 
-The player is confined to the board and may move horizontally or vertically onto empty squares (never through walls or boxes). The player can move a box by walking up to it and push it to the square in front. Boxes cannot be pulled, and they cannot be pushed to squares with walls or other boxes. The number of boxes equals the number of storage locations. The puzzle is solved when all boxes are placed at storage locations.  
-**Refs:** https://en.wikipedia.org/wiki/Sokoban
+The player is confined to the board and may move horizontally or vertically onto empty squares (never through walls or boxes). The player can move a box by walking up to it and push it to the square in front. Boxes cannot be pulled, and they cannot be pushed to squares with walls or other boxes. The number of boxes equals the number of storage locations. The puzzle is solved when all boxes are placed at storage locations.   
+<div align="center">
 ![](Images/sokoban.png)
+</div> 
+**Refs:** https://en.wikipedia.org/wiki/Sokoban
+
+
 
 ## Authors 
 **Quach Minh Tuan - To Thanh Phong - Vo Anh Nguyen**
