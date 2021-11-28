@@ -108,8 +108,12 @@ By solving the testcase by algorithm, we have `Visualize button` to simulate the
 + Video (Vietnamese language): https://www.youtube.com/watch?v=oT5ag8KVyHA
 + Slide for presentation (Vietnamese language): `slide.pdf`
 
-## Conclusion
-BFS is more effective compare to A* in this case. One of the reason is the  
+## Evaluation
+BFS is more effective compare to A* in this problem. To be more specific:
++ About the running time, A* algorithm is slower than 3 times compare with BFS. The reason is the algorithm inside when we implement. Firstly, A* needs to calculate the cost whenever it creates a new node. This stage uses `Hungarian algorithm` for matching the distance between the boxes and the goals and finding the minimum sum of this cost and it wastes `O(n^3)` while BFS doesn't need to store this value. Moreover, the data structure that we use for storing the list of nodes that is sorted in order of its cost is `min-heap (priority-queue)`. Every operation such as insert delete will cost us `O(log(n))` while node in BFS will be stored in a basic list and these operations just cost us `O(1)`.
++ About the space, the average node generated in A* algorithm is just bigger little bit compare with that of BFS algorithm. Since BFS will scan nodes in the whole current level until finding the final state or go to the next level and repeat it while A* will choose the node that has the minimum cost and go toward that node and expand more nodes in child level and continue to compare the cost and choose the next node until finding the final state so it's not restricted we must scan all node in a level. Therefore, A* algorithm just combines BFS and DFS and reduces more node generated and space when running.
+
+In general, the solver will run exceed `1 second` when the map has the number of boxes and goals more than 4 and the space is large that we analyze more space of state.
 <div align="center">
 <img src="Charts/Average.png" align="center"/>
 </div>
