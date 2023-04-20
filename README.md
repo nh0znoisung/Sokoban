@@ -9,7 +9,7 @@ The player is confined to the board and may move horizontally or vertically onto
 <div align="center">
 <img src="Images/sokoban.png" align="center"/>
 </div> 
-**Refs:** [link](https://en.wikipedia.org/wiki/Sokoban)
+Wiki Refs: [link](https://en.wikipedia.org/wiki/Sokoban)
 
 
 
