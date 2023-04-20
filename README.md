@@ -1,6 +1,6 @@
 # Sokoban game
 **Assignment 1 - Introduction to Artificial Intelligence**  
-This project is aimed to create a `Sokoban` game that we can play manually or automatically using *searching algorithm*. We use two searching algorithms here, the first is 'BFS' for blind search and 'A*' for heuristic search. Our team selects `Pygame` to create the UI of this game. In this project, we are going to play and solve the Sokoban game in 80 maps including 40 testcases in `Micro Cosmos` and 40 testcases in `Mini Cosmos` (source: [link](https://ksokoban.online/)). All problems and tasks we can see in `assignment1.pdf` file (Vietnamese language).
+This project is aimed to create a `Sokoban` game that we can play manually or automatically using *searching algorithm*. We use two searching algorithms here, the first is 'BFS' for blind search and 'A*' for heuristic search. Our team selects `Pygame` to create the UI of this game. In this project, we are going to play and solve the Sokoban game in 80 maps including 40 testcases in `Micro Cosmos` and 40 testcases in `Mini Cosmos` (source: [link](https://ksokoban.online/)). All problems and tasks we can see in `assignment1.pdf` file (Vietnamese language). Wiki Refs: [link](https://en.wikipedia.org/wiki/Sokoban)
 
 ## Introduction of Sokoban
 Sokoban is a puzzle video game genre in which the player pushes crates or boxes around in a warehouse, trying to get them to some goal locations.The game is played on a board of squares, where each square is a floor or a wall. Some floor squares contain boxes, and some floor squares are marked as goal locations.
@@ -9,7 +9,7 @@ The player is confined to the board and may move horizontally or vertically onto
 <div align="center">
 <img src="Images/sokoban.png" align="center"/>
 </div> 
-Wiki Refs: [link](https://en.wikipedia.org/wiki/Sokoban)
+
 
 
 
